@@ -37,27 +37,27 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         exit(1);
     }
 
-    /* here is an example for how to use readAndParse to read a line from
-        inFilePtr */
-    if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
-        /* reached end of file */
-    }
+    // /* here is an example for how to use readAndParse to read a line from
+    //     inFilePtr */
+    // if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
+    //     /* reached end of file */
+    // }
 
-    /* this is how to rewind the file ptr so that you start reading from the
-        beginning of the file */
-    rewind(inFilePtr);
+    // /* this is how to rewind the file ptr so that you start reading from the
+    //     beginning of the file */
+    // rewind(inFilePtr);
 
     /* after doing a readAndParse, you may want to do the following to test the
         opcode */
-    if (!strcmp(opcode, "add")) {
-        /* do whatever you need to do for opcode "add" */
-    }
 
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
 
-        printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
-    }
+        printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);   
+         if (!strcmp(opcode, "add")) {
+            /* do whatever you need to do for opcode "add" */
 
+         }
+    }
     return(0);
 }
 
@@ -116,3 +116,11 @@ int isNumber(char *string)
     int i;
     return( (sscanf(string, "%d", &i)) == 1);
 }
+
+void biToHex(char bin[]){
+    // Convert binary to integer using strtol
+    unsigned int decimal = strtol(bin, NULL, 2);
+    // Print the decimal number in hexadecimal format
+    printf("Hexadecimal: %X\n", decimal);
+}
+
