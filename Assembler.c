@@ -8,17 +8,19 @@
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) //argv = argument vector, argc = argument count 
 {
     char *inFileString, *outFileString;
     FILE *inFilePtr, *outFilePtr;
     char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
 
-    if (argc != 3) {
+    if (argc != 3) { 
         printf("error: usage: %s <assembly-code-file> <machine-code-file>\n",
             argv[0]);
         exit(1);
+    }else{
+        printf("can access to file \n");
     }
 
     inFileString = argv[1];
@@ -49,6 +51,11 @@ int main(int argc, char *argv[])
         opcode */
     if (!strcmp(opcode, "add")) {
         /* do whatever you need to do for opcode "add" */
+    }
+
+    while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
+
+        printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
     }
 
     return(0);
