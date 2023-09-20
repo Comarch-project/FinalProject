@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     FILE *inFilePtr, *outFilePtr;
     char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
-
+    char binaryOp[4];
     if (argc != 3) { 
         printf("error: usage: %s <assembly-code-file> <machine-code-file>\n",
             argv[0]);
@@ -52,11 +52,27 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
 
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
 
-        printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);   
-         if (!strcmp(opcode, "add")) {
-            /* do whatever you need to do for opcode "add" */
-
-         }
+        //printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
+        if (!strcmp(opcode, "add")) {
+            strcpy(binaryOp,"000");
+            
+        }else if(!strcmp(opcode, "nand")){
+            strcpy(binaryOp,"001");
+        }else if(!strcmp(opcode, "lw")){
+            strcpy(binaryOp,"010");
+        }else if(!strcmp(opcode, "sw")){
+            strcpy(binaryOp,"011");
+        }else if(!strcmp(opcode, "beq")){
+            strcpy(binaryOp,"100");
+        }else if(!strcmp(opcode, "jalr")){
+            strcpy(binaryOp,"101");
+        }else if(!strcmp(opcode, "halt")){
+            strcpy(binaryOp,"110");
+        }else if(!strcmp(opcode, "noop")){
+            strcpy(binaryOp,"111");
+        }
+        printf(binaryOp);
+        printf("\n");
     }
     return(0);
 }
