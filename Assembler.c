@@ -137,32 +137,30 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
-char* decToBinary(char *string) {
+char* decToBinary(char *string) { //16 Bit 
     long int n = atol(string); // Use atol to convert string to long int
 
     // Calculate the number of bits required to represent the binary number
-    int numBits = 0;
-    long int temp = n;
-    while (temp > 0) {
-        temp /= 2;
-        numBits++;
-    }
+    // int numBits = 0;
+    // long int temp = n;
+    // while (temp > 0) {
+    //     temp /= 2;
+    //     numBits++;
+    // }
 
     // Allocate memory for the binary string
-    char *binaryStr = (char *)malloc((numBits + 1) * sizeof(char)); // +1 for the null terminator
+    char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
 
-    if (binaryStr == NULL) {
-        // Memory allocation failed
-        return NULL;
+    for (int i = 16 - 1; i >= 0; i--) {
+        binaryStr[i] = '0'; 
     }
-
     // Convert the decimal number to binary and store it in binaryStr
-    for (int i = numBits - 1; i >= 0; i--) {
+    for (int i = 16 - 1; i >= 0; i--) {
         binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
         n = n / 2;
     }
 
-    binaryStr[numBits] = '\0'; // Null-terminate the string
+    binaryStr[16] = '\0'; // Null-terminate the string
 
     return binaryStr;
 }
