@@ -140,7 +140,7 @@ int isNumber(char *string)
 void biToHex(char bin[]){
     // Convert binary to integer using strtol
     unsigned int decimal = strtol(bin, NULL, 2);
-    printf("Hexadecimal: %X\n", decimal);               //write to text here
+    printf("Hexadecimal: %X\n", decimal);         //write to text here
 }
 char* decToBinary(char *string) {
     long int n =atol(string);
@@ -182,7 +182,7 @@ char* decToBinary(char *string) {
         
         return binaryStr;
     } else {
-        // n is positive, use the original code
+        // n is positive
         int numBits = 0;
         long int temp = n;
         while (temp > 0) {
