@@ -7,7 +7,7 @@
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
-
+char* decToBinary(char *);
 int main(int argc, char *argv[]) //argv = argument vector, argc = argument count 
 {
     char *inFileString, *outFileString;
@@ -52,10 +52,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
 
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
 
-        //printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
-        if (!strcmp(opcode, "add")) {
+        printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);   
+ if (!strcmp(opcode, "add")) {
             strcpy(binaryOp,"000");
-            
+
         }else if(!strcmp(opcode, "nand")){
             strcpy(binaryOp,"001");
         }else if(!strcmp(opcode, "lw")){
@@ -71,8 +71,12 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         }else if(!strcmp(opcode, "noop")){
             strcpy(binaryOp,"111");
         }
-        printf(binaryOp);
+        char *biResult = decToBinary(arg2);
+        printf("decToBi: %s\n", biResult);
+        free(biResult); // Free the allocated memory
+        printf("binaryOp: %s",binaryOp);
         printf("\n");
+
     }
     return(0);
 }
@@ -133,10 +137,38 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
+char* decToBinary(char *string) {
+    long int n = atol(string); // Use atol to convert string to long int
+
+    // Calculate the number of bits required to represent the binary number
+    int numBits = 0;
+    long int temp = n;
+    while (temp > 0) {
+        temp /= 2;
+        numBits++;
+    }
+
+    // Allocate memory for the binary string
+    char *binaryStr = (char *)malloc((numBits + 1) * sizeof(char)); // +1 for the null terminator
+
+    if (binaryStr == NULL) {
+        // Memory allocation failed
+        return NULL;
+    }
+
+    // Convert the decimal number to binary and store it in binaryStr
+    for (int i = numBits - 1; i >= 0; i--) {
+        binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+        n = n / 2;
+    }
+
+    binaryStr[numBits] = '\0'; // Null-terminate the string
+
+    return binaryStr;
+}
 void biToHex(char bin[]){
     // Convert binary to integer using strtol
     unsigned int decimal = strtol(bin, NULL, 2);
-    // Print the decimal number in hexadecimal format
-    printf("Hexadecimal: %X\n", decimal);
+    printf("Hexadecimal: %X\n", decimal);               //write to text here
 }
 
