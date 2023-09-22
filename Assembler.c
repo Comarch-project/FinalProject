@@ -8,6 +8,7 @@
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
 char* decToBinary(char *);
+char* decToBiUnsign(char *);
 int main(int argc, char *argv[]) //argv = argument vector, argc = argument count 
 {
     char *inFileString, *outFileString;
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         }else if(!strcmp(opcode, "noop")){
             strcpy(binaryOp,"111");
         }
-        char *biResult = decToBinary(arg2);
+        char *biResult = decToBiUnsign(arg2);
         printf("decToBi: %s\n", biResult);
         free(biResult); // Free the allocated memory
         printf("binaryOp: %s",binaryOp);
@@ -203,4 +204,30 @@ char* decToBinary(char *string) {
 }
 
 
+char* decToBiUnsign(char *string) { //16 Bit 
+    long int n = atol(string); // Use atol to convert string to long int
 
+    // Calculate the number of bits required to represent the binary number
+    // int numBits = 0;
+    // long int temp = n;
+    // while (temp > 0) {
+    //     temp /= 2;
+    //     numBits++;
+    // }
+
+    // Allocate memory for the binary string
+    char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
+
+    for (int i = 16 - 1; i >= 0; i--) {
+        binaryStr[i] = '0'; 
+    }
+    // Convert the decimal number to binary and store it in binaryStr
+    for (int i = 16 - 1; i >= 0; i--) {
+        binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+        n = n / 2;
+    }
+
+    binaryStr[16] = '\0'; // Null-terminate the string
+
+    return binaryStr;
+}
