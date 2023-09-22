@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
 
         printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);   
- if (!strcmp(opcode, "add")) {
+        if (!strcmp(opcode, "add")) {
             strcpy(binaryOp,"000");
 
         }else if(!strcmp(opcode, "nand")){
@@ -137,36 +137,70 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
-char* decToBinary(char *string) { //16 Bit 
-    long int n = atol(string); // Use atol to convert string to long int
-
-    // Calculate the number of bits required to represent the binary number
-    // int numBits = 0;
-    // long int temp = n;
-    // while (temp > 0) {
-    //     temp /= 2;
-    //     numBits++;
-    // }
-
-    // Allocate memory for the binary string
-    char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
-
-    for (int i = 16 - 1; i >= 0; i--) {
-        binaryStr[i] = '0'; 
-    }
-    // Convert the decimal number to binary and store it in binaryStr
-    for (int i = 16 - 1; i >= 0; i--) {
-        binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
-        n = n / 2;
-    }
-
-    binaryStr[16] = '\0'; // Null-terminate the string
-
-    return binaryStr;
-}
 void biToHex(char bin[]){
     // Convert binary to integer using strtol
     unsigned int decimal = strtol(bin, NULL, 2);
-    printf("Hexadecimal: %X\n", decimal);               //write to text here
+    printf("Hexadecimal: %X\n", decimal);         //write to text here
 }
+char* decToBinary(char *string) {
+    long int n =atol(string);
+    // Handle negative numbers
+    if (n < 0) {
+        n = -n;  // Make n positive
+        // Determine the number of bits dynamically
+        int numBits = 0;
+        long int temp = n;
+        while (temp > 0) {
+            temp /= 2;
+            numBits++;
+        }
+        // Allocate memory for the binary string
+        char *binaryStr = (char *)malloc((numBits + 1) * sizeof(char)); // +1 for the null terminator
+        if (binaryStr == NULL) {
+            // Memory allocation failed
+            return NULL;
+        }
+        // Convert the absolute value of n to binary and store it in binaryStr
+        for (int i = numBits - 1; i >= 0; i--) {
+            binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+            n = n / 2;
+        }
+        binaryStr[numBits] = '\0'; // Null-terminate the string
+        // Perform two's complement to get the negative binary representation
+        for (int i = 0; i < numBits; i++) {
+            binaryStr[i] = (binaryStr[i] == '0') ? '1' : '0'; // Invert bits
+        }
+        int carry = 1; // Initialize carry to 1 for addition
+        for (int i = numBits - 1; i >= 0; i--) {
+            if (binaryStr[i] == '0' && carry == 1) {
+                binaryStr[i] = '1';
+                carry = 0; // No need to carry anymore
+            } else if (binaryStr[i] == '1' && carry == 1) {
+                binaryStr[i] = '0'; // Carry over to the next bit
+            }
+        }
+        
+        return binaryStr;
+    } else {
+        // n is positive
+        int numBits = 0;
+        long int temp = n;
+        while (temp > 0) {
+            temp /= 2;
+            numBits++;
+        }
+        char *binaryStr = (char *)malloc((numBits + 1) * sizeof(char));
+        if (binaryStr == NULL) {
+            return NULL;
+        }
+        for (int i = numBits - 1; i >= 0; i--) {
+            binaryStr[i] = (n % 2) + '0';
+            n = n / 2;
+        }
+        binaryStr[numBits] = '\0';
+        return binaryStr;
+    }
+}
+
+
 
