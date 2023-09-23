@@ -7,8 +7,12 @@
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
-char* decToBinary(char *);
+char* decToBiSign16b(char *);
 char* decToBiUnsign(char *);
+struct KeyValuePair {
+    char key[50];
+    int value;
+};
 int main(int argc, char *argv[]) //argv = argument vector, argc = argument count 
 {
     char *inFileString, *outFileString;
@@ -16,6 +20,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
     char binaryOp[4];
+    char binaryMachCode[33] = "00000000000000000000000000000000";
+
+        // Define the maximum number of key-value pairs in the list
+    int maxPairs = 32;
+    // Create an array of KeyValuePair structs to store the data
+    struct KeyValuePair keyValueList[maxPairs];
+
     if (argc != 3) { 
         printf("error: usage: %s <assembly-code-file> <machine-code-file>\n",
             argv[0]);
@@ -50,13 +61,43 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
 
     /* after doing a readAndParse, you may want to do the following to test the
         opcode */
+    int linecnt = 0;
+    int keyvalpt = 0;
+    while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
+        if(!strcmp(opcode,".fill")){
+            printf("%s \n",opcode);
+            strcpy(keyValueList[keyvalpt].key, label);
+            if(isNumber(arg0)){
+                keyValueList[keyvalpt].value = atoi(arg0);
+            }else{
+                int i;
+                for (i = 0; i < maxPairs; i++) {
+                    if (!strcmp(keyValueList[i].key, arg0)) {
+                        keyValueList[keyvalpt].value = keyValueList[i].value;
+                        break;
+                    }
+                }
+            }
+            keyvalpt++;
+        }else if(strcmp(label,"")){
+            printf("%s \n",label);
+            strcpy(keyValueList[keyvalpt].key, label);
+            keyValueList[keyvalpt].value = linecnt;
+            keyvalpt++;
+        }
+        linecnt++;
+    }
+    int i;
+    for (i = 0; i < keyvalpt; i++) {
+            printf("Value for key '%s' is %d\n", keyValueList[i].key, keyValueList[i].value);
+    }
+    rewind(inFilePtr);
 
+    linecnt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
-
         printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
         if (!strcmp(opcode, "add")) {
             strcpy(binaryOp,"000");
-
         }else if(!strcmp(opcode, "nand")){
             strcpy(binaryOp,"001");
         }else if(!strcmp(opcode, "lw")){
@@ -65,23 +106,31 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             strcpy(binaryOp,"011");
         }else if(!strcmp(opcode, "beq")){
             strcpy(binaryOp,"100");
+            binaryMachCode[31] = binaryOp[2];
+            binaryMachCode[30] = binaryOp[1];
+            binaryMachCode[29] = binaryOp[0];
         }else if(!strcmp(opcode, "jalr")){
             strcpy(binaryOp,"101");
         }else if(!strcmp(opcode, "halt")){
             strcpy(binaryOp,"110");
+            binaryMachCode[31] = binaryOp[2];
+            binaryMachCode[30] = binaryOp[1];
+            binaryMachCode[29] = binaryOp[0];
         }else if(!strcmp(opcode, "noop")){
             strcpy(binaryOp,"111");
-        }else if(!strcmp(opcode,".fill")){
-            
         }else{
             printf("this is error region"); //try to catch error here
         }
-        char *biResult = decToBinary(arg2);
+        char *biResult = decToBiUnsign(arg2);
         printf("decToBi: %s\n", biResult);
-        free(biResult); // Free the allocated memory
-        printf("binaryOp: %s",binaryOp);
-        printf("\n");
-
+        free(biResult); // Free the allocated memosry
+        printf("binaryOp: %s\n",binaryOp);
+        printf("address : %d\n",linecnt);
+        printf("%s \n",binaryMachCode);
+        biToHex(binaryMachCode);
+        printf("--------------------------------------------\n");
+        strcpy(binaryMachCode, "00000000000000000000000000000000");
+        linecnt++;
     }
     return(0);
 }
@@ -97,6 +146,8 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
  *
  * exit(1) if line is too long.
  */
+
+
 int readAndParse(FILE *inFilePtr, char *label, char *opcode, char *arg0,
     char *arg1, char *arg2)
 {
@@ -147,7 +198,8 @@ void biToHex(char bin[]){
     unsigned int decimal = strtol(bin, NULL, 2);
     printf("Hexadecimal: %X\n", decimal);         //write to text here
 }
-char* decToBinary(char *string) {
+
+char* decToBiSign16b(char *string) {
     long int n =atol(string);
     // Handle negative numbers
     if (n < 0) {
@@ -155,9 +207,8 @@ char* decToBinary(char *string) {
         // Determine the number of bits dynamically
         // Allocate memory for the binary string
         char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
-        if (binaryStr == NULL) {
-            // Memory allocation failed
-            return NULL;
+        for (int i = 16 - 1; i >= 0; i--) {
+            binaryStr[i] = '0'; 
         }
         // Convert the absolute value of n to binary and store it in binaryStr
         for (int i = 16 - 1; i >= 0; i--) {
@@ -183,30 +234,28 @@ char* decToBinary(char *string) {
 }
 
 
-char* decToBiUnsign(char *string) { //16 Bit 
+char* decToBiUnsign(char *string) { 
     long int n = atol(string); // Use atol to convert string to long int
 
     // Calculate the number of bits required to represent the binary number
-    // int numBits = 0;
-    // long int temp = n;
-    // while (temp > 0) {
-    //     temp /= 2;
-    //     numBits++;
-    // }
-
+    int numBits = 0;
+    long int temp = n;
+    while (temp > 0) {
+        temp /= 2;
+        numBits++;
+    }
     // Allocate memory for the binary string
-    char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
-
-    for (int i = 16 - 1; i >= 0; i--) {
+    char *binaryStr = (char *)malloc((numBits + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = numBits - 1; i >= 0; i--) {
         binaryStr[i] = '0'; 
     }
     // Convert the decimal number to binary and store it in binaryStr
-    for (int i = 16 - 1; i >= 0; i--) {
+    for (int i = numBits - 1; i >= 0; i--) {
         binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
         n = n / 2;
     }
 
-    binaryStr[16] = '\0'; // Null-terminate the string
+    binaryStr[numBits] = '\0'; // Null-terminate the string
 
     return binaryStr;
 }
