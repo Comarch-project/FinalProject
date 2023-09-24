@@ -9,6 +9,8 @@ int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
 char* decToBiSign16b(char *);
 char* decToBiUnsign3b(char *);
+char* decToBiSign32b(char *);
+
 struct KeyValuePair {
     char key[50];
     char value[50];
@@ -63,7 +65,6 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     int keyvalpt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){
-            printf("%s \n",opcode);
             strcpy(keyValueList[keyvalpt].key, label);
             if(isNumber(arg0)){
                 strcpy(keyValueList[keyvalpt].value, arg0) ;
@@ -84,9 +85,6 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             keyvalpt++;
         }
         linecnt++;
-    }
-    for (int i = 0; i < keyvalpt; i++) {
-        printf("Value for key '%s' is %s\n", keyValueList[i].key, keyValueList[i].value);
     }
     rewind(inFilePtr);
 
@@ -170,16 +168,30 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[10]=binaryOp[1];
             binaryMachCode[9]=binaryOp[0];
         }else if(!strcmp(opcode, ".fill")){
-
-            // strcpy(binaryMachCode,biCode);
+            char *biCode;
+            int value;
+            if(isNumber(arg0)){
+                biCode=decToBiSign32b(arg0);
+                value = atoi(arg0);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg0, keyValueList[i].key)){
+                        biCode=decToBiSign32b(keyValueList[i].value);
+                        value = atoi(keyValueList[i].value);
+                    }
+                }
+            }
+            printf("biCode: %s\n",biCode);
+            strcpy(binaryMachCode,biCode);
+            biToHex4fill(biCode,outFilePtr,linecnt,value);
         }
         //char *biResult = decToBiUnsign(arg2);
         // char *biResult = decToBiSign16b(arg2);
         // free(biResult); // Free the allocated memosry
         printf("binaryOp: %s\n",binaryOp);
         printf("address : %d\n",linecnt);
-        printf("%s \n",binaryMachCode);
-        biToHex(binaryMachCode,outFilePtr,linecnt);
+        printf("biMachCode: %s \n",binaryMachCode);
+        if(strcmp(opcode, ".fill")) biToHex(binaryMachCode,outFilePtr,linecnt);
         printf("--------------------------------------------\n");
         strcpy(binaryMachCode, "00000000000000000000000000000000");
         linecnt++;
@@ -248,8 +260,15 @@ int isNumber(char *string)
 
 void biToHex(char bin[],FILE *str,int addr){
     // Convert binary to integer using strtol
-    unsigned int decimal = strtol(bin, NULL, 2);
+    unsigned int decimal = strtoll(bin, NULL, 2);
     fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,decimal,decimal);
+    printf("Hexadecimal: %X\n", decimal);         //write to text here
+}
+
+void biToHex4fill(char bin[],FILE *str,int addr,int val){
+    // Convert binary to integer using strtol
+    unsigned int decimal = strtoll(bin, NULL, 2);
+    fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,val,decimal);
     printf("Hexadecimal: %X\n", decimal);         //write to text here
 }
 
@@ -313,3 +332,47 @@ char* decToBiUnsign3b(char *string) {
 
     return binaryStr;
 }
+
+
+char* decToBiSign32b(char *string) { 
+    long int n =atol(string);
+    // Determine the number of bits dynamically
+    // Allocate memory for the binary string
+    char *binaryStr = (char *)malloc((32 + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = 32 - 1; i >= 0; i--) {
+    binaryStr[i] = '0'; 
+    }
+    // Handle negative numbers
+    if (n < 0) {
+        n = -n;  // Make n positive
+        // Convert the absolute value of n to binary and store it in binaryStr
+        for (int i = 32 - 1; i >= 0; i--) {
+            binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+            n = n / 2;
+        }
+        binaryStr[32] = '\0'; // Null-terminate the string
+        // Perform two's complement to get the negative binary representation
+        for (int i = 0; i < 32; i++) {
+            binaryStr[i] = (binaryStr[i] == '0') ? '1' : '0'; // Invert bits
+        }
+        int carry = 1; // Initialize carry to 1 for addition
+        for (int i = 32 - 1; i >= 0; i--) {
+            if (binaryStr[i] == '0' && carry == 1) {
+                binaryStr[i] = '1';
+                carry = 0; // No need to carry anymore
+            } else if (binaryStr[i] == '1' && carry == 1) {
+                binaryStr[i] = '0'; // Carry over to the next bit
+            }
+        }
+    }else{
+    // Convert the decimal number to binary and store it in binaryStr
+        for (int i = 32 - 1; i >= 0; i--) {
+        binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+        n = n / 2;
+        }
+    binaryStr[32] = '\0';
+    }
+    return binaryStr;
+}
+
+
