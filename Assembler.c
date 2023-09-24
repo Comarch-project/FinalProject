@@ -142,16 +142,57 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             free(biRS);
             free(biRT);
             free(biRD);
-        }else if(!strcmp(opcode, "lw")){
-            strcpy(binaryOp,"010");
-            
-            
-        }else if(!strcmp(opcode, "sw")){
-            strcpy(binaryOp,"011");
-            
-            
-        }else if(!strcmp(opcode, "beq")){
-            strcpy(binaryOp,"100");
+        }else if(!strcmp(opcode, "lw")||!strcmp(opcode, "sw")||!strcmp(opcode, "beq")){
+            char *biRS,*biRT,*biRD;
+            if(!strcmp(opcode, "lw"))strcpy(binaryOp,"010");
+            if(!strcmp(opcode, "sw"))strcpy(binaryOp,"011");
+            if(!strcmp(opcode, "beq"))strcpy(binaryOp,"100");
+            binaryMachCode[7]=binaryOp[0];
+            binaryMachCode[8]=binaryOp[1];
+            binaryMachCode[9]=binaryOp[2];
+            //Add rs
+            if(isNumber(arg0)){
+                biRS = decToBiUnsign3b(arg0);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg0, keyValueList[i].key)){
+                        biRS = decToBiUnsign3b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[10]=biRS[0];
+            binaryMachCode[11]=biRS[1];
+            binaryMachCode[12]=biRS[2];
+            if(isNumber(arg1)){
+                biRT = decToBiUnsign3b(arg1);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg1, keyValueList[i].key)){
+                        biRT = decToBiUnsign3b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[13]=biRT[0];
+            binaryMachCode[14]=biRT[1];
+            binaryMachCode[15]=biRT[2];
+            //Add rd
+            if(isNumber(arg2)){
+                biRD = decToBiSign16b(arg2);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg2, keyValueList[i].key)){
+                        biRD = decToBiSign16b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[29]=biRD[13];
+            binaryMachCode[30]=biRD[14];
+            binaryMachCode[31]=biRD[15];
+
+            free(biRS);
+            free(biRT);
+            free(biRD);
+
         }else if(!strcmp(opcode, "jalr")){
             strcpy(binaryOp,"101");
             binaryMachCode[11]=binaryOp[2];
