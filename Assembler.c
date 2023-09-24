@@ -14,6 +14,7 @@ char* decToBiSign32b(char *);
 struct KeyValuePair {
     char key[50];
     char value[50];
+    char address[50];
 };
 int main(int argc, char *argv[]) //argv = argument vector, argc = argument count 
 {
@@ -68,11 +69,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             strcpy(keyValueList[keyvalpt].key, label);
             if(isNumber(arg0)){
                 strcpy(keyValueList[keyvalpt].value, arg0) ;
+                strcpy(keyValueList[keyvalpt].address, linecnt);
             }else{
                 int i;
                 for (i = 0; i < maxPairs; i++) {
                     if (!strcmp(keyValueList[i].key, arg0)) {
                         strcpy(keyValueList[keyvalpt].value, keyValueList[i].value);
+                        strcpy(keyValueList[keyvalpt].address, linecnt);
                         break;
                     }
                 }
@@ -82,6 +85,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             printf("%s \n",label);
             strcpy(keyValueList[keyvalpt].key, label);
             strcpy(keyValueList[keyvalpt].value, itoa(linecnt,keyValueList[keyvalpt].value,50));
+            strcpy(keyValueList[keyvalpt].address, linecnt);
             keyvalpt++;
         }
         linecnt++;
