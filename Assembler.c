@@ -12,6 +12,7 @@ char* decToBiUnsign3b(char *);
 char* decToBiSign32b(char *);
 
 struct KeyValuePair {
+    char type[50];
     char key[50];
     char value[50];
     char address[50];
@@ -66,29 +67,33 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     int keyvalpt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){
+            strcpy(keyValueList[keyvalpt].type, opcode);
             strcpy(keyValueList[keyvalpt].key, label);
             if(isNumber(arg0)){
                 strcpy(keyValueList[keyvalpt].value, arg0) ;
-                strcpy(keyValueList[keyvalpt].address, linecnt);
+                strcpy(keyValueList[keyvalpt].address, itoa(linecnt,keyValueList[keyvalpt].address,50));
             }else{
                 int i;
                 for (i = 0; i < maxPairs; i++) {
                     if (!strcmp(keyValueList[i].key, arg0)) {
                         strcpy(keyValueList[keyvalpt].value, keyValueList[i].value);
-                        strcpy(keyValueList[keyvalpt].address, linecnt);
+                        strcpy(keyValueList[keyvalpt].address, itoa(linecnt,keyValueList[keyvalpt].address,50));
                         break;
                     }
                 }
             }
             keyvalpt++;
         }else if(strcmp(label,"")){
-            printf("%s \n",label);
+            strcpy(keyValueList[keyvalpt].type, opcode);
             strcpy(keyValueList[keyvalpt].key, label);
             strcpy(keyValueList[keyvalpt].value, itoa(linecnt,keyValueList[keyvalpt].value,50));
-            strcpy(keyValueList[keyvalpt].address, linecnt);
+            strcpy(keyValueList[keyvalpt].address, itoa(linecnt,keyValueList[keyvalpt].address,50));
             keyvalpt++;
         }
         linecnt++;
+    }
+    for (int i = 0; i < keyvalpt; i++) {
+        printf("> %s %s %s\n",keyValueList[i].key,keyValueList[i].value,keyValueList[i].address);
     }
     rewind(inFilePtr);
 
@@ -146,11 +151,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             free(biRS);
             free(biRT);
             free(biRD);
-        }else if(!strcmp(opcode, "lw")||!strcmp(opcode, "sw")||!strcmp(opcode, "beq")){
-            char *biRS,*biRT,*biRD;
+        }else if(!strcmp(opcode, "lw")||!strcmp(opcode, "sw")){
+            char *biRS,*biRT,*biOff;
             if(!strcmp(opcode, "lw"))strcpy(binaryOp,"010");
             if(!strcmp(opcode, "sw"))strcpy(binaryOp,"011");
-            if(!strcmp(opcode, "beq"))strcpy(binaryOp,"100");
             binaryMachCode[7]=binaryOp[0];
             binaryMachCode[8]=binaryOp[1];
             binaryMachCode[9]=binaryOp[2];
@@ -167,6 +171,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[10]=biRS[0];
             binaryMachCode[11]=biRS[1];
             binaryMachCode[12]=biRS[2];
+            //Add rd
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
@@ -179,39 +184,123 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[13]=biRT[0];
             binaryMachCode[14]=biRT[1];
             binaryMachCode[15]=biRT[2];
-            //Add rd
+            //Add offsetField
             if(isNumber(arg2)){
-                biRD = decToBiSign16b(arg2);
+                biOff = decToBiSign16b(arg2);
             }else{
                 for (int i = 0; i < keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
-                        biRD = decToBiSign16b(keyValueList[i].value);
+                        biOff = decToBiSign16b(keyValueList[i].address);
                     }
                 }
             }
-            binaryMachCode[29]=biRD[13];
-            binaryMachCode[30]=biRD[14];
-            binaryMachCode[31]=biRD[15];
+            for(int i=16;i<32;i++){
+                binaryMachCode[i]=biOff[i-16];
+            }
 
             free(biRS);
             free(biRT);
-            free(biRD);
+            free(biOff);
+        }else if(!strcmp(opcode, "beq")){
+            char *biRS,*biRT,*biOff;
+            strcpy(binaryOp,"100");
+            binaryMachCode[7]=binaryOp[0];
+            binaryMachCode[8]=binaryOp[1];
+            binaryMachCode[9]=binaryOp[2];
+            //Add rs
+            if(isNumber(arg0)){
+                biRS = decToBiUnsign3b(arg0);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg0, keyValueList[i].key)){
+                        biRS = decToBiUnsign3b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[10]=biRS[0];
+            binaryMachCode[11]=biRS[1];
+            binaryMachCode[12]=biRS[2];
+            //Add rd
+            if(isNumber(arg1)){
+                biRT = decToBiUnsign3b(arg1);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg1, keyValueList[i].key)){
+                        biRT = decToBiUnsign3b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[13]=biRT[0];
+            binaryMachCode[14]=biRT[1];
+            binaryMachCode[15]=biRT[2];
+            //Add offsetField
+            if(isNumber(arg2)){
+                biOff = decToBiSign16b(arg2);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg2, keyValueList[i].key)){
+                        int offseti = (-linecnt)-1+atoi(keyValueList[i].address);
+                        char offsetc[32];
+                        sprintf(offsetc, "%d", offseti);
+                        printf("%s\n",offsetc);
+                        biOff = decToBiSign16b(offsetc);
+                        printf("%s\n",biOff);
+                    }
+                }
+            }
+            for(int i=16;i<32;i++){
+                binaryMachCode[i]=biOff[i-16];
+            }
 
+            free(biRS);
+            free(biRT);
+            free(biOff);
+            
         }else if(!strcmp(opcode, "jalr")){
+            char *biRS,*biRT;
             strcpy(binaryOp,"101");
             binaryMachCode[11]=binaryOp[2];
             binaryMachCode[10]=binaryOp[1];
             binaryMachCode[9]=binaryOp[0];
+            //Add rs
+            if(isNumber(arg0)){
+                biRS = decToBiUnsign3b(arg0);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg0, keyValueList[i].key)){
+                        biRS = decToBiUnsign3b(keyValueList[i].address);
+                    }
+                }
+            }
+            binaryMachCode[10]=biRS[0];
+            binaryMachCode[11]=biRS[1];
+            binaryMachCode[12]=biRS[2];
+            //Add rd
+            if(isNumber(arg1)){
+                biRT = decToBiUnsign3b(arg1);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg1, keyValueList[i].key)){
+                        biRT = decToBiUnsign3b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[13]=biRT[0];
+            binaryMachCode[14]=biRT[1];
+            binaryMachCode[15]=biRT[2];
+            
+            free(biRS);
+            free(biRT);
         }else if(!strcmp(opcode, "halt")){
             strcpy(binaryOp,"110");
-            binaryMachCode[11]=binaryOp[2];
-            binaryMachCode[10]=binaryOp[1];
-            binaryMachCode[9]=binaryOp[0];
+            binaryMachCode[7]=binaryOp[0];
+            binaryMachCode[8]=binaryOp[1];
+            binaryMachCode[9]=binaryOp[2];
         }else if(!strcmp(opcode, "noop")){
             strcpy(binaryOp,"111");
-            binaryMachCode[11]=binaryOp[2];
-            binaryMachCode[10]=binaryOp[1];
-            binaryMachCode[9]=binaryOp[0];
+            binaryMachCode[7]=binaryOp[0];
+            binaryMachCode[8]=binaryOp[1];
+            binaryMachCode[9]=binaryOp[2];
         }else if(!strcmp(opcode, ".fill")){
             char *biCode;
             int value;
