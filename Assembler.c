@@ -93,28 +93,57 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     linecnt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
         printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
-        if (!strcmp(opcode, "add")) {
-            char *biArg0;
-            strcpy(binaryOp,"000");
-            if(isNumber(arg1)){
-                biArg0 = decToBiSign16b(arg1);
+        if (!strcmp(opcode, "add")||!strcmp(opcode, "nand")) {
+            char *biRS,*biRT,*biRD;
+            //Add opcode
+            if(!strcmp(opcode, "add")) strcpy(binaryOp,"000");
+            if(!strcmp(opcode, "nand")) strcpy(binaryOp,"001");
+            binaryMachCode[7]=binaryOp[0];
+            binaryMachCode[8]=binaryOp[1];
+            binaryMachCode[9]=binaryOp[2];
+            //Add rs
+            if(isNumber(arg0)){
+                biRS = decToBiUnsign3b(arg0);
             }else{
                 for (int i = 0; i < keyvalpt; i++) {
-                    if(!strcmp(arg1, keyValueList[i].key)){
-                        biArg0 = decToBiSign16b(keyValueList[i].value);
+                    if(!strcmp(arg0, keyValueList[i].key)){
+                        biRS = decToBiUnsign3b(keyValueList[i].value);
                     }
                 }
             }
-            printf("GG:%s \n",biArg0);
-            // char *biArg1 = decToBiSign16b(arg1);
-            // char *biArg2 = decToBiUnsign3b(arg1);
-            // binaryMachCode[11]=biArg1[0];
-            // binaryMachCode[12]=biArg2[1];
-            // binaryMachCode[13]=biArg1[2];
-        }else if(!strcmp(opcode, "nand")){
-            strcpy(binaryOp,"001");
-            
-            
+            binaryMachCode[10]=biRS[0];
+            binaryMachCode[11]=biRS[1];
+            binaryMachCode[12]=biRS[2];
+            //Add rt
+            if(isNumber(arg1)){
+                biRT = decToBiUnsign3b(arg1);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg1, keyValueList[i].key)){
+                        biRT = decToBiUnsign3b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[13]=biRT[0];
+            binaryMachCode[14]=biRT[1];
+            binaryMachCode[15]=biRT[2];
+            //Add rd
+            if(isNumber(arg2)){
+                biRD = decToBiUnsign3b(arg2);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg2, keyValueList[i].key)){
+                        biRD = decToBiUnsign3b(keyValueList[i].value);
+                    }
+                }
+            }
+            binaryMachCode[29]=biRD[0];
+            binaryMachCode[30]=biRD[1];
+            binaryMachCode[31]=biRD[2];
+
+            free(biRS);
+            free(biRT);
+            free(biRD);
         }else if(!strcmp(opcode, "lw")){
             strcpy(binaryOp,"010");
             
@@ -141,20 +170,21 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[10]=binaryOp[1];
             binaryMachCode[9]=binaryOp[0];
         }else if(!strcmp(opcode, ".fill")){
-            
+
+            // strcpy(binaryMachCode,biCode);
         }
         //char *biResult = decToBiUnsign(arg2);
-        char *biResult = decToBiSign16b(arg2);
-        printf("decToBi: %s\n", biResult);
-        free(biResult); // Free the allocated memosry
+        // char *biResult = decToBiSign16b(arg2);
+        // free(biResult); // Free the allocated memosry
         printf("binaryOp: %s\n",binaryOp);
         printf("address : %d\n",linecnt);
         printf("%s \n",binaryMachCode);
-        biToHex(binaryMachCode);
+        biToHex(binaryMachCode,outFilePtr,linecnt);
         printf("--------------------------------------------\n");
         strcpy(binaryMachCode, "00000000000000000000000000000000");
         linecnt++;
     }
+    fclose(outFilePtr);
     return(0);
 }
 
@@ -216,9 +246,10 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
-void biToHex(char bin[]){
+void biToHex(char bin[],FILE *str,int addr){
     // Convert binary to integer using strtol
     unsigned int decimal = strtol(bin, NULL, 2);
+    fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,decimal,decimal);
     printf("Hexadecimal: %X\n", decimal);         //write to text here
 }
 
