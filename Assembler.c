@@ -11,7 +11,7 @@ char* decToBiSign16b(char *);
 char* decToBiUnsign3b(char *);
 struct KeyValuePair {
     char key[50];
-    int value;
+    char value[50];
 };
 int main(int argc, char *argv[]) //argv = argument vector, argc = argument count 
 {
@@ -66,12 +66,12 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             printf("%s \n",opcode);
             strcpy(keyValueList[keyvalpt].key, label);
             if(isNumber(arg0)){
-                keyValueList[keyvalpt].value = atoi(arg0);
+                strcpy(keyValueList[keyvalpt].value, arg0) ;
             }else{
                 int i;
                 for (i = 0; i < maxPairs; i++) {
                     if (!strcmp(keyValueList[i].key, arg0)) {
-                        keyValueList[keyvalpt].value = keyValueList[i].value;
+                        strcpy(keyValueList[keyvalpt].value, keyValueList[i].value);
                         break;
                     }
                 }
@@ -80,13 +80,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         }else if(strcmp(label,"")){
             printf("%s \n",label);
             strcpy(keyValueList[keyvalpt].key, label);
-            keyValueList[keyvalpt].value = linecnt;
+            strcpy(keyValueList[keyvalpt].value, itoa(linecnt,keyValueList[keyvalpt].value,50));
             keyvalpt++;
         }
         linecnt++;
     }
     for (int i = 0; i < keyvalpt; i++) {
-        printf("Value for key '%s' is %d\n", keyValueList[i].key, keyValueList[i].value);
+        printf("Value for key '%s' is %s\n", keyValueList[i].key, keyValueList[i].value);
     }
     rewind(inFilePtr);
 
@@ -94,16 +94,23 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
         printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
         if (!strcmp(opcode, "add")) {
+            char *biArg0;
             strcpy(binaryOp,"000");
-            if(!isNumber(arg2)){
-                
+            if(isNumber(arg1)){
+                biArg0 = decToBiSign16b(arg1);
+            }else{
+                for (int i = 0; i < keyvalpt; i++) {
+                    if(!strcmp(arg1, keyValueList[i].key)){
+                        biArg0 = decToBiSign16b(keyValueList[i].value);
+                    }
+                }
             }
-            char *biArg0 = decToBiSign16b(arg1);
-            char *biArg1 = decToBiSign16b(arg1);
-            char *biArg2 = decToBiUnsign3b(arg1);
-            binaryMachCode[11]=biArg1[0];
-            binaryMachCode[12]=biArg2[1];
-            binaryMachCode[13]=biArg1[2];
+            printf("GG:%s \n",biArg0);
+            // char *biArg1 = decToBiSign16b(arg1);
+            // char *biArg2 = decToBiUnsign3b(arg1);
+            // binaryMachCode[11]=biArg1[0];
+            // binaryMachCode[12]=biArg2[1];
+            // binaryMachCode[13]=biArg1[2];
         }else if(!strcmp(opcode, "nand")){
             strcpy(binaryOp,"001");
             
