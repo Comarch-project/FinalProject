@@ -6,6 +6,27 @@
 #define NUMREGS 8 /* number of machine registers */
 #define MAXLINELENGTH 1000
 
+char decimalToBinary(int decimal) {
+    
+    // Determine the number of bits needed for the binary representation
+    int numBits = sizeof(decimal) * 8;
+    int binary[numBits]; // Array to store binary bits
+
+    // Calculate binary representation
+    for (int i = numBits - 1; i >= 0; i--) {
+        binary[i] = decimal % 2;
+        decimal /= 2;
+    }
+
+    // Print binary representation
+    for (int i = 0; i < numBits; i++) {
+        printf("%d", binary[i]);
+        if ((i + 1) % 4 == 0) // Print a space every 4 bits for readability
+            printf(" ");
+    }
+    printf("\n");
+}
+
 typedef struct stateStruct {
     int pc;
     int mem[NUMMEMORY];
@@ -36,17 +57,28 @@ int main(int argc, char *argv[])
     /* read in the entire machine-code file into memory */
     for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;
 	state.numMemory++) {
-	if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
-	    printf("error in reading address %d\n", state.numMemory);
-	    exit(1);
-	}
-	printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
+
+        char *biCode;
+
+        if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
+            printf("error in reading address %d\n", state.numMemory);
+            exit(1);
+        }
+        printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
+
+        biCode=decimalToBinary(state.mem[state.numMemory]);//covert d2b
+        printf("%c",biCode);//test dec to binary  
+        //implement bicode to array and cotain array[33]  {[33], [33], [],}
+
     }
 
     state.pc = 0; // set pc to 0
     for (int i = 0; i < NUMREGS; i++) {
         state.reg[i] = 0;  // Set all registers to 0
     }
+
+    printState(&state);
+    
 
     return(0);
 }
@@ -66,3 +98,5 @@ void printState(stateType *statePtr)
 	}
     printf("end state\n");
 }
+
+
