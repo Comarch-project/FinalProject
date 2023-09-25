@@ -7,7 +7,7 @@
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
-char* decToBiSign16b(char *);
+char* decToBiSign16b(char *,int);
 char* decToBiUnsign3b(char *);
 char* decToBiSign32b(char *);
 int biToHex(char[] ,FILE *,int );
@@ -85,6 +85,12 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             }
             keyvalpt++;
         }else if(strcmp(label,"")){
+            for (int i = 0; i < keyvalpt; i++) {
+                if(!strcmp(label, keyValueList[i].key)){
+                    printf("Duplicated lable at line %d",linecnt+1);
+                    exit(1) ;
+                }
+            }
             strcpy(keyValueList[keyvalpt].type, opcode);
             strcpy(keyValueList[keyvalpt].key, label);
             strcpy(keyValueList[keyvalpt].value, itoa(linecnt,keyValueList[keyvalpt].value,50));
@@ -113,9 +119,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -126,9 +136,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -139,9 +153,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg2)){
                 biRD = decToBiUnsign3b(arg2);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         biRD = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg2);
+                        exit(1);
                     }
                 }
             }
@@ -163,9 +181,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -176,9 +198,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -187,12 +213,17 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[15]=biRT[2];
             //Add offsetField
             if(isNumber(arg2)){
-                biOff = decToBiSign16b(arg2);
+                biOff = decToBiSign16b(arg2,linecnt);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
-                        biOff = decToBiSign16b(keyValueList[i].address);
+                        biOff = decToBiSign16b(keyValueList[i].address,linecnt);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg2);
+                        exit(1);
                     }
+                    
                 }
             }
             for(int i=16;i<32;i++){
@@ -212,9 +243,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -225,9 +260,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -236,16 +275,20 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[15]=biRT[2];
             //Add offsetField
             if(isNumber(arg2)){
-                biOff = decToBiSign16b(arg2);
+                biOff = decToBiSign16b(arg2,linecnt);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         int offseti = (-linecnt)-1+atoi(keyValueList[i].address);
                         char offsetc[32];
                         sprintf(offsetc, "%d", offseti);
                         printf("%s\n",offsetc);
-                        biOff = decToBiSign16b(offsetc);
+                        biOff = decToBiSign16b(offsetc,linecnt);
                         printf("%s\n",biOff);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg2);
+                        exit(1);
                     }
                 }
             }
@@ -267,9 +310,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].address);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -280,9 +327,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -309,10 +360,14 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                 biCode=decToBiSign32b(arg0);
                 value = atoi(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biCode=decToBiSign32b(keyValueList[i].value);
                         value = atoi(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -411,9 +466,12 @@ int biToHex4fill(char bin[],FILE *str,int addr,int val){
     return(1);
 }
 
-char* decToBiSign16b(char *string) {
+char* decToBiSign16b(char *string,int linecnt) {
     long int n =atol(string);
-    // Determine the number of bits dynamically
+    if(n>32768||n<(-32768)){
+        printf("Wrong offset input at line %d",linecnt+1);
+        exit(1) ;
+    }
     // Allocate memory for the binary string
     char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 16 - 1; i >= 0; i--) {
@@ -475,7 +533,6 @@ char* decToBiUnsign3b(char *string) {
 
 char* decToBiSign32b(char *string) { 
     long int n =atol(string);
-    // Determine the number of bits dynamically
     // Allocate memory for the binary string
     char *binaryStr = (char *)malloc((32 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 32 - 1; i >= 0; i--) {
