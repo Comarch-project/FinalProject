@@ -10,6 +10,8 @@ int isNumber(char *);
 char* decToBiSign16b(char *);
 char* decToBiUnsign3b(char *);
 char* decToBiSign32b(char *);
+int biToHex(char[] ,FILE *,int );
+int biToHex4fill(char[] ,FILE *,int ,int );
 
 struct KeyValuePair {
     char type[50];
@@ -64,6 +66,17 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     /* after doing a readAndParse, you may want to do the following to test the
         opcode */
     int linecnt = 0;
+    while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
+        if(!strcmp(opcode,".fill")||!strcmp(opcode,"add")||!strcmp(opcode,"nand")||!strcmp(opcode,"lw")||!strcmp(opcode,"sw")||!strcmp(opcode,"beq")||!strcmp(opcode,"jalr")||!strcmp(opcode,"halt")||!strcmp(opcode,"noop")){
+            linecnt++;
+        }else{
+            printf("Undefine label at address %d (line %d)",linecnt,linecnt+1);
+            exit(1) ;
+        }
+    }
+    rewind(inFilePtr);
+
+    linecnt = 0;
     int keyvalpt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){
@@ -318,6 +331,8 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             printf("biCode: %s\n",biCode);
             strcpy(binaryMachCode,biCode);
             biToHex4fill(biCode,outFilePtr,linecnt,value);
+
+            free(biCode);
         }
         //char *biResult = decToBiUnsign(arg2);
         // char *biResult = decToBiSign16b(arg2);
@@ -392,18 +407,20 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
-void biToHex(char bin[],FILE *str,int addr){
+int biToHex(char bin[],FILE *str,int addr){
     // Convert binary to integer using strtol
     unsigned int decimal = strtoll(bin, NULL, 2);
     fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,decimal,decimal);
     printf("Hexadecimal: %X\n", decimal);         //write to text here
+    return(1);
 }
 
-void biToHex4fill(char bin[],FILE *str,int addr,int val){
+int biToHex4fill(char bin[],FILE *str,int addr,int val){
     // Convert binary to integer using strtol
     unsigned int decimal = strtoll(bin, NULL, 2);
     fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,val,decimal);
     printf("Hexadecimal: %X\n", decimal);         //write to text here
+    return(1);
 }
 
 char* decToBiSign16b(char *string) {
