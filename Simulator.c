@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 #define NUMMEMORY 65536 /* maximum number of words in memory */
 #define NUMREGS 8 /* number of machine registers */
 #define MAXLINELENGTH 1000
@@ -33,6 +33,14 @@ int main(int argc, char *argv[])
 	exit(1);
     }
 
+    // Create a stateType structure
+    stateType currentState;
+    // Initialize the currentState structure with some values
+    currentState.pc = 0;  // Set the program counter
+    // Initialize memory and registers as needed
+    currentState.numMemory = 0;  // Set the number of memory elements
+
+
     /* read in the entire machine-code file into memory */
     for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;
 	state.numMemory++) {
@@ -42,6 +50,8 @@ int main(int argc, char *argv[])
 	}
 	printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
     }
+
+   printState(&currentState);
 
     return(0);
 }
