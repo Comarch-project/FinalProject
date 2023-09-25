@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 #define NUMMEMORY 65536 /* maximum number of words in memory */
 #define NUMREGS 8 /* number of machine registers */
 #define MAXLINELENGTH 1000
@@ -41,6 +41,11 @@ int main(int argc, char *argv[])
 	    exit(1);
 	}
 	printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
+    }
+
+    state.pc = 0; // set pc to 0
+    for (int i = 0; i < NUMREGS; i++) {
+        state.reg[i] = 0;  // Set all registers to 0
     }
 
     return(0);
