@@ -26,25 +26,25 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
     char binaryOp[4];
+    // Set out but binary to 32 bit
     char binaryMachCode[33] = "00000000000000000000000000000000";
 
-        // Define the maximum number of key-value pairs in the list
+    // Define the maximum number of key-value pairs in the list
     int maxPairs = 32;
     // Create an array of KeyValuePair structs to store the data
     struct KeyValuePair keyValueList[maxPairs];
 
+    // Wrong input when calling assembler
     if (argc != 3) { 
         printf("error: usage: %s <assembly-code-file> <machine-code-file>\n",
             argv[0]);
         exit(1);
     }
-
+    // Set input file and output file
     inFileString = argv[1];
     outFileString = argv[2];
-
-    inFilePtr = fopen(inFileString, "r");                        //เปิดไฟล์
-    if (inFilePtr == NULL) {                                     // ถ้า ไฟล์ว่าง
-        printf("error in opening %s\n", inFileString);
+    inFilePtr = fopen(inFileString, "r");                        
+    if (inFilePtr == NULL) {                                     
         exit(1);
     }
     outFilePtr = fopen(outFileString, "w");
@@ -52,19 +52,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         printf("error in opening %s\n", outFileString);
         exit(1);
     }
-
-    // /* here is an example for how to use readAndParse to read a line from
-    //     inFilePtr */
-    // if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
-    //     /* reached end of file */
-    // }
-
-    // /* this is how to rewind the file ptr so that you start reading from the
-    //     beginning of the file */
-    // rewind(inFilePtr);
-
-    /* after doing a readAndParse, you may want to do the following to test the
-        opcode */
+    // Read all line in file to indicate false instruction
     int linecnt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")||!strcmp(opcode,"add")||!strcmp(opcode,"nand")||!strcmp(opcode,"lw")||!strcmp(opcode,"sw")||!strcmp(opcode,"beq")||!strcmp(opcode,"jalr")||!strcmp(opcode,"halt")||!strcmp(opcode,"noop")){
@@ -75,9 +63,9 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         }
     }
     rewind(inFilePtr);
-
-    linecnt = 0;
-    int keyvalpt = 0;
+    // Initiate value of each lable 
+    linecnt = 0; // To indicate address
+    int keyvalpt = 0; // To indicate current size of keyValue
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){
             strcpy(keyValueList[keyvalpt].type, opcode);
