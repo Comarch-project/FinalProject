@@ -47,9 +47,10 @@ int main(int argc, char *argv[])
         //printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
        
         printf("biToDec :%s\n",decimalToBinary(state.mem[state.numMemory]));
+
         for(int bitPosition=0; bitPosition<32; bitPosition++){
             //implement bicode to array and cotain array[33]  {[33], [33], [],}
-            int bitValue = getBit(state.mem[state.numMemory], bitPosition);
+            //int bitValue = getBit(state.mem[state.numMemory], bitPosition);
             //printf("bit[%d] = %d\n", bitPosition, bitValue);//test each bit position
 
         }

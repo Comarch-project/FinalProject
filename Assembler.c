@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         if(!strcmp(opcode,".fill")||!strcmp(opcode,"add")||!strcmp(opcode,"nand")||!strcmp(opcode,"lw")||!strcmp(opcode,"sw")||!strcmp(opcode,"beq")||!strcmp(opcode,"jalr")||!strcmp(opcode,"halt")||!strcmp(opcode,"noop")){
             linecnt++;
         }else{
-            printf("Undefine label at address %d (line %d)",linecnt,linecnt+1);
+            printf("Undefine instruction/opcode at address %d (line %d)",linecnt,linecnt+1);
             exit(1) ;
         }
     }
@@ -389,7 +389,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         linecnt++;
     }
     fclose(outFilePtr);
-    return(0);
+    exit(0);
 }
 
 /*
