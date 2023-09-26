@@ -7,7 +7,7 @@
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
-char* decToBiSign16b(char *);
+char* decToBiSign16b(char *,int);
 char* decToBiUnsign3b(char *);
 char* decToBiSign32b(char *);
 int biToHex(char[] ,FILE *,int );
@@ -26,25 +26,25 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
     char binaryOp[4];
+    // Set out but binary to 32 bit
     char binaryMachCode[33] = "00000000000000000000000000000000";
 
-        // Define the maximum number of key-value pairs in the list
+    // Define the maximum number of key-value pairs in the list
     int maxPairs = 32;
     // Create an array of KeyValuePair structs to store the data
     struct KeyValuePair keyValueList[maxPairs];
 
+    // Wrong input when calling assembler
     if (argc != 3) { 
         printf("error: usage: %s <assembly-code-file> <machine-code-file>\n",
             argv[0]);
         exit(1);
     }
-
+    // Set input file and output file
     inFileString = argv[1];
     outFileString = argv[2];
-
-    inFilePtr = fopen(inFileString, "r");                        //เปิดไฟล์
-    if (inFilePtr == NULL) {                                     // ถ้า ไฟล์ว่าง
-        printf("error in opening %s\n", inFileString);
+    inFilePtr = fopen(inFileString, "r");                        
+    if (inFilePtr == NULL) {                                     
         exit(1);
     }
     outFilePtr = fopen(outFileString, "w");
@@ -52,19 +52,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         printf("error in opening %s\n", outFileString);
         exit(1);
     }
-
-    // /* here is an example for how to use readAndParse to read a line from
-    //     inFilePtr */
-    // if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
-    //     /* reached end of file */
-    // }
-
-    // /* this is how to rewind the file ptr so that you start reading from the
-    //     beginning of the file */
-    // rewind(inFilePtr);
-
-    /* after doing a readAndParse, you may want to do the following to test the
-        opcode */
+    // Read all line in file to indicate false instruction
     int linecnt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")||!strcmp(opcode,"add")||!strcmp(opcode,"nand")||!strcmp(opcode,"lw")||!strcmp(opcode,"sw")||!strcmp(opcode,"beq")||!strcmp(opcode,"jalr")||!strcmp(opcode,"halt")||!strcmp(opcode,"noop")){
@@ -75,9 +63,9 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         }
     }
     rewind(inFilePtr);
-
-    linecnt = 0;
-    int keyvalpt = 0;
+    // Initiate value of each lable 
+    linecnt = 0; // To indicate address
+    int keyvalpt = 0; // To indicate current size of keyValue
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){
             strcpy(keyValueList[keyvalpt].type, opcode);
@@ -97,6 +85,12 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             }
             keyvalpt++;
         }else if(strcmp(label,"")){
+            for (int i = 0; i < keyvalpt; i++) {
+                if(!strcmp(label, keyValueList[i].key)){
+                    printf("Duplicated lable at line %d",linecnt+1);
+                    exit(1) ;
+                }
+            }
             strcpy(keyValueList[keyvalpt].type, opcode);
             strcpy(keyValueList[keyvalpt].key, label);
             strcpy(keyValueList[keyvalpt].value, itoa(linecnt,keyValueList[keyvalpt].value,50));
@@ -125,9 +119,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -138,9 +136,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -151,9 +153,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg2)){
                 biRD = decToBiUnsign3b(arg2);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         biRD = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg2);
+                        exit(1);
                     }
                 }
             }
@@ -175,9 +181,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -188,9 +198,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -199,12 +213,17 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[15]=biRT[2];
             //Add offsetField
             if(isNumber(arg2)){
-                biOff = decToBiSign16b(arg2);
+                biOff = decToBiSign16b(arg2,linecnt);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
-                        biOff = decToBiSign16b(keyValueList[i].address);
+                        biOff = decToBiSign16b(keyValueList[i].address,linecnt);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg2);
+                        exit(1);
                     }
+                    
                 }
             }
             for(int i=16;i<32;i++){
@@ -224,9 +243,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -237,9 +260,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -248,16 +275,20 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[15]=biRT[2];
             //Add offsetField
             if(isNumber(arg2)){
-                biOff = decToBiSign16b(arg2);
+                biOff = decToBiSign16b(arg2,linecnt);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         int offseti = (-linecnt)-1+atoi(keyValueList[i].address);
                         char offsetc[32];
                         sprintf(offsetc, "%d", offseti);
                         printf("%s\n",offsetc);
-                        biOff = decToBiSign16b(offsetc);
+                        biOff = decToBiSign16b(offsetc,linecnt);
                         printf("%s\n",biOff);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg2);
+                        exit(1);
                     }
                 }
             }
@@ -279,9 +310,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg0)){
                 biRS = decToBiUnsign3b(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].address);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -292,9 +327,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg1)){
                 biRT = decToBiUnsign3b(arg1);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg1);
+                        exit(1);
                     }
                 }
             }
@@ -321,10 +360,14 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                 biCode=decToBiSign32b(arg0);
                 value = atoi(arg0);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biCode=decToBiSign32b(keyValueList[i].value);
                         value = atoi(keyValueList[i].value);
+                        break;
+                    }else if(i == keyvalpt){
+                        printf("Label %s was undefined",arg0);
+                        exit(1);
                     }
                 }
             }
@@ -423,9 +466,12 @@ int biToHex4fill(char bin[],FILE *str,int addr,int val){
     return(1);
 }
 
-char* decToBiSign16b(char *string) {
+char* decToBiSign16b(char *string,int linecnt) {
     long int n =atol(string);
-    // Determine the number of bits dynamically
+    if(n>32768||n<(-32768)){
+        printf("Wrong offset input at line %d",linecnt+1);
+        exit(1) ;
+    }
     // Allocate memory for the binary string
     char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 16 - 1; i >= 0; i--) {
@@ -487,7 +533,6 @@ char* decToBiUnsign3b(char *string) {
 
 char* decToBiSign32b(char *string) { 
     long int n =atol(string);
-    // Determine the number of bits dynamically
     // Allocate memory for the binary string
     char *binaryStr = (char *)malloc((32 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 32 - 1; i >= 0; i--) {
