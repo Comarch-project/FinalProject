@@ -56,15 +56,18 @@ int main(int argc, char *argv[])
              bipo=decimalToBinary(state.mem[state.numMemory]);
              if((bipo[7]=='1')&&bipo[8]=='1'&&(bipo[9]=='0')){
              hlted =1;
+             linecnt++;
+             continue;
             }
             if(hlted == 1){
-            strcpy(keyValueList[keyvalpt].address, (linecnt));
-            strcpy(keyValueList[keyvalpt].value, state.mem[state.numMemory]);
+            keyValueList[keyvalpt].address = linecnt;
+            keyValueList[keyvalpt].value =  state.mem[state.numMemory];
             keyvalpt++;
             }
             linecnt++;
         }
     }
+
     for(int i=0;i<keyvalpt;i++){
         printf("%d\n",keyValueList[i].address);
         printf("%d\n",keyValueList[i].value);
