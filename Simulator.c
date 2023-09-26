@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -6,31 +5,9 @@
 #define NUMREGS 8 /* number of machine registers */
 #define MAXLINELENGTH 1000
 
-char decimalToBinary(int decimal) {
-    
-    // Determine the number of bits needed for the binary representation
-    int numBits = sizeof(decimal) * 8;
-    int binary[numBits]; // Array to store binary bits
-
-    // Calculate binary representation
-    for (int i = numBits - 1; i >= 0; i--) {
-        binary[i] = decimal % 2;
-        decimal /= 2;
-    }
-
-    // Print binary representation
-    for (int i = 0; i < numBits; i++) {
-        printf("%d", binary[i]);
-        if ((i + 1) % 4 == 0) // Print a space every 4 bits for readability
-            printf(" ");
-    }
-    printf("\n");
-}
-
-int getBit(int decimal, int bitPosition) {
-    return (decimal & (1 << bitPosition)) >> bitPosition;
-}
-
+char decimalToBinary(int);
+int getBit(int , int );
+void printState(stateType *);
 
 typedef struct stateStruct {
     int pc;
@@ -39,7 +16,6 @@ typedef struct stateStruct {
     int numMemory;
 } stateType;
 
-void printState(stateType *);
 
 int main(int argc, char *argv[])
 {
@@ -71,14 +47,13 @@ int main(int argc, char *argv[])
         }
         printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
        
-    
-        printf("bi = ",biCode);//test dec to binary  
+        printf("bi = ",biCode);//test dec to binary 
         biCode=decimalToBinary(state.mem[state.numMemory]);//covert d2b
-
+        
         for(int bitPosition=0; bitPosition<32; bitPosition++){
             //implement bicode to array and cotain array[33]  {[33], [33], [],}
             int bitValue = getBit(state.mem[state.numMemory], bitPosition);
-            printf("bit[%d] = %d\n", bitPosition, bitValue);//test each bit position
+            //printf("bit[%d] = %d\n", bitPosition, bitValue);//test each bit position
 
         }
         
@@ -89,7 +64,7 @@ int main(int argc, char *argv[])
         state.reg[i] = 0;  // Set all registers to 0
     }
 
-    printState(&state);
+   // printState(&state);
     
 
     return(0);
@@ -109,6 +84,31 @@ void printState(stateType *statePtr)
 	    printf("\t\treg[ %d ] %d\n", i, statePtr->reg[i]);
 	}
     printf("end state\n");
+}
+
+char decimalToBinary(int decimal) {
+    
+    // Determine the number of bits needed for the binary representation
+    int numBits = sizeof(decimal) * 8;
+    int binary[numBits]; // Array to store binary bits
+
+    // Calculate binary representation
+    for (int i = numBits - 1; i >= 0; i--) {
+        binary[i] = decimal % 2;
+        decimal /= 2;
+    }
+
+    // Print binary representation
+    for (int i = 0; i < numBits; i++) {
+        printf("%d", binary[i]);
+        if ((i + 1) % 4 == 0) // Print a space every 4 bits for readability
+            printf(" ");
+    }
+    printf("\n");
+}
+
+int getBit(int decimal, int bitPosition) {
+    return (decimal & (1 << bitPosition)) >> bitPosition;
 }
 
 
