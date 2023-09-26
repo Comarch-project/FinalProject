@@ -7,7 +7,6 @@
 
 char decimalToBinary(int);
 int getBit(int , int );
-void printState(stateType *);
 
 typedef struct stateStruct {
     int pc;
@@ -15,7 +14,7 @@ typedef struct stateStruct {
     int reg[NUMREGS];
     int numMemory;
 } stateType;
-
+void printState(stateType *);
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +38,7 @@ int main(int argc, char *argv[])
     for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;
 	state.numMemory++) {
 
-        char *biCode;
+        char biCode;
 
         if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
             printf("error in reading address %d\n", state.numMemory);
