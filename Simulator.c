@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
         }
         printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
        
+    
         printf("bi = ",biCode);//test dec to binary  
         biCode=decimalToBinary(state.mem[state.numMemory]);//covert d2b
 
