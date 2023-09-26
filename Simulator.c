@@ -86,13 +86,40 @@ void printState(stateType *statePtr)
 
 char* decimalToBinary(int n) {
     
-    char *binaryStr = (char *)malloc((32 + 1) * sizeof(char));
-    // Calculate binary representation
+   char *binaryStr = (char *)malloc((32 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 32 - 1; i >= 0; i--) {
-        binaryStr[i] = (n % 2)+'0';
-        n = n/2;
+    binaryStr[i] = '0'; 
     }
+    // Handle negative numbers
+    if (n < 0) {
+        n = -n;  // Make n positive
+        // Convert the absolute value of n to binary and store it in binaryStr
+        for (int i = 32 - 1; i >= 0; i--) {
+            binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+            n = n / 2;
+        }
+        binaryStr[32] = '\0'; // Null-terminate the string
+        // Perform two's complement to get the negative binary representation
+        for (int i = 0; i < 32; i++) {
+            binaryStr[i] = (binaryStr[i] == '0') ? '1' : '0'; // Invert bits
+        }
+        int carry = 1; // Initialize carry to 1 for addition
+        for (int i = 32 - 1; i >= 0; i--) {
+            if (binaryStr[i] == '0' && carry == 1) {
+                binaryStr[i] = '1';
+                carry = 0; // No need to carry anymore
+            } else if (binaryStr[i] == '1' && carry == 1) {
+                binaryStr[i] = '0'; // Carry over to the next bit
+            }
+        }
+    }else{
+    // Convert the decimal number to binary and store it in binaryStr
+        for (int i = 32 - 1; i >= 0; i--) {
+        binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+        n = n / 2;
+        }
     binaryStr[32] = '\0';
+    }
     return binaryStr;
 }
 
