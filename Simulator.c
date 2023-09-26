@@ -27,6 +27,11 @@ char decimalToBinary(int decimal) {
     printf("\n");
 }
 
+int getBit(int decimal, int bitPosition) {
+    return (decimal & (1 << bitPosition)) >> bitPosition;
+}
+
+
 typedef struct stateStruct {
     int pc;
     int mem[NUMMEMORY];
@@ -65,11 +70,17 @@ int main(int argc, char *argv[])
             exit(1);
         }
         printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
-
+       
+        printf("bi = ",biCode);//test dec to binary  
         biCode=decimalToBinary(state.mem[state.numMemory]);//covert d2b
-        printf("%c",biCode);//test dec to binary  
-        //implement bicode to array and cotain array[33]  {[33], [33], [],}
 
+        for(int bitPosition=0; bitPosition<32; bitPosition++){
+            //implement bicode to array and cotain array[33]  {[33], [33], [],}
+            int bitValue = getBit(state.mem[state.numMemory], bitPosition);
+            printf("bit[%d] = %d\n", bitPosition, bitValue);//test each bit position
+
+        }
+        
     }
 
     state.pc = 0; // set pc to 0
