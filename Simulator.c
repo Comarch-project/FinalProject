@@ -6,7 +6,6 @@
 #define MAXLINELENGTH 1000
 
 char* decimalToBinary(int);
-int getBit(int , int );
 
 typedef struct stateStruct {
     int pc;
@@ -38,23 +37,57 @@ int main(int argc, char *argv[])
     for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;
 	state.numMemory++) {
 
-        char biCode;
+        char *bipo;
+        char pc=state.numMemory;
 
         if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
             printf("error in reading address %d\n", state.numMemory);
             exit(1);
         }
-        //printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
+        printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
        
         printf("biToDec :%s\n",decimalToBinary(state.mem[state.numMemory]));
+        bipo=decimalToBinary(state.mem[state.numMemory]);
 
-        for(int bitPosition=0; bitPosition<32; bitPosition++){
-            //implement bicode to array and cotain array[33]  {[33], [33], [],}
-            //int bitValue = getBit(state.mem[state.numMemory], bitPosition);
-            //printf("bit[%d] = %d\n", bitPosition, bitValue);//test each bit position
+        if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
+        {
+            printf("kuyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+            char rs[4];
+            rs[2]=bipo[12];
+            rs[1]=bipo[11];
+            rs[0]=bipo[10];
+            char rt[4];
+            rt[2]=bipo[15];
+            rt[1]=bipo[14];
+            rt[0]=bipo[13];
+            char rd[4];
+            rd[2]=bipo[31];
+            rd[1]=bipo[30];
+            rd[0]=bipo[29];
+            printf("add %s,%s,%s",rs,rt,rd);
 
         }
-        
+        else if(!strcmp(bipo[7],"0") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//nand
+        {
+
+        }else if(!strcmp(bipo[7],"0") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"0"))//lw
+        {
+
+        }else if(!strcmp(bipo[7],"0") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"1"))//sw
+        {
+
+        }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"0"))//beq
+        {
+
+        }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//jalr
+        {
+
+        }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"0"))//halt
+        {
+
+        }
+        // else (!strcmp(bipo[7],"1") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"1"))//noop
+
     }
 
     state.pc = 0; // set pc to 0
@@ -123,8 +156,5 @@ char* decimalToBinary(int n) {
     return binaryStr;
 }
 
-int getBit(int decimal, int bitPosition) {
-    return (decimal & (1 << bitPosition)) >> bitPosition;
-}
 
 
