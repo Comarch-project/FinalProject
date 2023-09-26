@@ -13,6 +13,11 @@ typedef struct stateStruct {
     int reg[NUMREGS];
     int numMemory;
 } stateType;
+
+struct KeyValuePair {
+    int value;
+    int address;
+};
 void printState(stateType *);
 
 int main(int argc, char *argv[])
@@ -21,6 +26,11 @@ int main(int argc, char *argv[])
     stateType state;
     FILE *filePtr;
 
+    // Define the maximum number of key-value pairs in the list
+    int maxPairs = 32;
+    // Create an array of KeyValuePair structs to store the data
+    struct KeyValuePair keyValueList[maxPairs];
+    
     if (argc != 2) {
 	printf("error: usage: %s <machine-code file>\n", argv[0]);
 	exit(1);
@@ -32,8 +42,36 @@ int main(int argc, char *argv[])
 	perror("fopen");
 	exit(1);
     }
-
+    int linecnt = 0;
+    int keyvalpt =0;
+    int hlted =0;
+    char temp[50];
+    /* read in file to check where is halt and insert .fill value*/
+    for(state.numMemory =0;fgets(line,MAXLINELENGTH,filePtr)!=NULL;state.numMemory++){
+        if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
+            printf("error in reading address %d\n", state.numMemory);
+            exit(1);
+         }else{
+             char *bipo;
+             bipo=decimalToBinary(state.mem[state.numMemory]);
+             if((bipo[7]=='1')&&bipo[8]=='1'&&(bipo[9]=='0')){
+             hlted =1;
+            }
+            if(hlted == 1){
+            strcpy(keyValueList[keyvalpt].address, (linecnt));
+            strcpy(keyValueList[keyvalpt].value, state.mem[state.numMemory]);
+            keyvalpt++;
+            }
+            linecnt++;
+        }
+    }
+    for(int i=0;i<keyvalpt;i++){
+        printf("%d\n",keyValueList[i].address);
+        printf("%d\n",keyValueList[i].value);
+    }
+    rewind(filePtr);
     /* read in the entire machine-code file into memory */
+    linecnt = 0;
     for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;
 	state.numMemory++) {
 
@@ -44,14 +82,13 @@ int main(int argc, char *argv[])
             printf("error in reading address %d\n", state.numMemory);
             exit(1);
         }
-        printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
+        //printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
        
-        printf("biToDec :%s\n",decimalToBinary(state.mem[state.numMemory]));
+        //printf("biToDec :%s\n",decimalToBinary(state.mem[state.numMemory]));
         bipo=decimalToBinary(state.mem[state.numMemory]);
 
         if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
         {
-            printf("kuyyyyyyyyyyyyyyyyyyyyyyyyyyy");
             char rs[4];
             rs[2]=bipo[12];
             rs[1]=bipo[11];
@@ -64,7 +101,7 @@ int main(int argc, char *argv[])
             rd[2]=bipo[31];
             rd[1]=bipo[30];
             rd[0]=bipo[29];
-            printf("add %s,%s,%s",rs,rt,rd);
+            //printf("add %s,%s,%s",rs,rt,rd);
 
         }
         else if(!strcmp(bipo[7],"0") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//nand
