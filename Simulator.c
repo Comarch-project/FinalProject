@@ -127,10 +127,27 @@ int main(int argc, char *argv[])
                 printf("add %s,%s,%s",rs,rt,Rd);
 
             }
-            // else if(!strcmp(bipo[7],"0") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//nand
-            // {
-
-            // }
+            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
+            {
+                char rs[4];
+                rs[2]=bipo[12];
+                rs[1]=bipo[11];
+                rs[0]=bipo[10];
+                char rt[4];
+                rt[2]=bipo[15];
+                rt[1]=bipo[14];
+                rt[0]=bipo[13];
+                char rd[4];
+                rd[2]=bipo[31];
+                rd[1]=bipo[30];
+                rd[0]=bipo[29];
+                for(int i=0; i<3; i++)
+                { 
+                    if(rs[i]=='1' && rt[i]=='1'){
+                    rd[i]='0';
+                    }else rd[i]='1';
+                }
+            }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='0'))//lw
             {   
                 char rs[4];
@@ -158,20 +175,20 @@ int main(int argc, char *argv[])
                 int asd = binaryToDecimal("1111111111111111");
                 printf("%d",asd);
             }
-            // else if(!strcmp(bipo[7],"0") && !strcmp(bsipo[8],"1") && !strcmp(bipo[9],"1"))//sw
+            // else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
             // {
 
-            // }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"0"))//beq
+            // }else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
             // {
 
-            // }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//jalr
+            // }else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
             // {
 
-            // }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"0"))//halt
+            // }else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
             // {
 
             // }
-            // else (!strcmp(bipo[7],"1") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"1"))//noop
+            // else ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
 
         }
         rewind(filePtr);
