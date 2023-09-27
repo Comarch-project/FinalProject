@@ -548,8 +548,9 @@ char* decToBiSign32b(char *string) {
         }
         binaryStr[32] = '\0'; // Null-terminate the string
         // Perform two's complement to get the negative binary representation
-        for (int i = 0; i < 32; i++) {
-            binaryStr[i] = (binaryStr[i] == '0') ? '1' : '0'; // Invert bits
+        for (int i = 0; i < 32; i++) { //inverse bit
+            if(binaryStr[i]=='0') binaryStr[i] = '1';
+            if(binaryStr[i]=='1') binaryStr[i] = '0';
         }
         int carry = 1; // Initialize carry to 1 for addition
         for (int i = 32 - 1; i >= 0; i--) {

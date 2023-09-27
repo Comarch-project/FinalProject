@@ -6,6 +6,7 @@
 #define MAXLINELENGTH 1000
 
 char* decimalToBinary(int);
+int binaryToDecimalSign(char *);
 
 typedef struct stateStruct {
     int pc;
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
     }
 
     for(int a=0;a<3;a++){
-        printState(&state);
+        //printState(&state);
         for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;state.numMemory++) {
             char *bipo;
             if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
@@ -135,9 +136,9 @@ int main(int argc, char *argv[])
                 for(int i=16;i<32;i++){
                     offset[i-16]=bipo[i];
                 }
-                printf("%s\n",rs);
-                printf("%s\n",rt);
-                printf("%s\n",offset);
+                //printf("%s\n",rs);
+                //printf("%s\n",rt);
+                //printf("%s\n",offset);
 
                  for(int i=0;i<keyvalpt;i++){
                      if(keyValueList[i].address==binaryToDecimal(offset)){
@@ -145,8 +146,8 @@ int main(int argc, char *argv[])
                         break;
                      }
                  }
-                int asd = binaryToDecimal("1111111111111111");
-                printf("%d",asd);
+                int asd = binaryToDecimalSign("1111111111111110");
+                printf("%d\n",asd);
             }
             // else if(!strcmp(bipo[7],"0") && !strcmp(bsipo[8],"1") && !strcmp(bipo[9],"1"))//sw
             // {
@@ -230,7 +231,7 @@ char* decimalToBinary(int n) {
     return binaryStr;
 }
 
-int binaryToDecimal(const char *binaryString) {
+int binaryToDecimal(char *binaryString) {
     int decimal = 0;
     for (int i = 0; i < 3; i++) {
         if (binaryString[i] == '1') {
@@ -243,9 +244,25 @@ int binaryToDecimal(const char *binaryString) {
     return decimal;
 }
 
-int binaryToDecimalSign(const char *binaryString) {
+int binaryToDecimalSign(char *biString) {
     int decimal = 0;
+    char binaryString[16];
+    strcpy(binaryString,biString);
+    printf("%s\n",binaryString);
     if(binaryString[0]=='1'){
+        for (int i = 1; i < 16; i++) {
+            if(binaryString[i]=='0') binaryString[i] = '1';
+            if(binaryString[i]=='1') binaryString[i] = '0';
+        }
+        int carry = 1; // Initialize carry to 1 for addition
+        for (int i = 15 - 1; i >= 1; i--) {
+            if (binaryString[i] == '0' && carry == 1) {
+                binaryString[i] = '1';
+                carry = 0; // No need to carry anymore
+            } else if (binaryString[i] == '1' && carry == 1) {
+                binaryString[i] = '0'; // Carry over to the next bit
+            }
+        }
         
         for (int i = 1; i < 16; i++) {
             if (binaryString[i] == '1') {
@@ -254,7 +271,9 @@ int binaryToDecimalSign(const char *binaryString) {
                 printf("Invalid binary input: %c\n", binaryString[i]);
                 return -1; // Error: Invalid character in binary string
             }
+
         }
+        decimal = -decimal;
     }else{
         for (int i = 1; i < 16; i++) {
             if (binaryString[i] == '1') {
@@ -265,7 +284,6 @@ int binaryToDecimalSign(const char *binaryString) {
             }
         }
     }
-
     return decimal;
 }
 
