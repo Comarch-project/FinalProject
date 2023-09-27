@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
                 //printf("add %s,%s,%s",rs,rt,rd);
 
             }
-            else if(!strcmp(bipo[7],"0") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//nand
+            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
             {
                 char rs[4];
                 rs[2]=bipo[12];
@@ -165,20 +165,20 @@ int main(int argc, char *argv[])
                 int asd = binaryToDecimal("1111111111111111");
                 printf("%d",asd);
             }
-            // else if(!strcmp(bipo[7],"0") && !strcmp(bsipo[8],"1") && !strcmp(bipo[9],"1"))//sw
+            // else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
             // {
 
-            // }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"0"))//beq
+            // }else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
             // {
 
-            // }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//jalr
+            // }else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
             // {
 
-            // }else if(!strcmp(bipo[7],"1") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"0"))//halt
+            // }else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
             // {
 
             // }
-            // else (!strcmp(bipo[7],"1") && !strcmp(bipo[8],"1") && !strcmp(bipo[9],"1"))//noop
+            // else ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
 
         }
         rewind(filePtr);
