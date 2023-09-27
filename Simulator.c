@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
             printf("%s\n",bipo);
-            if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//add
+            if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
             {
                 printState(&state);
                 char rs[4];
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     
                 continue;
             }
-            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//nand
+            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
             {
                 char rs[4];
                 rs[2]=bipo[12];
