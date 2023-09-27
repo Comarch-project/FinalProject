@@ -51,58 +51,44 @@ int main(int argc, char *argv[])
             printf("memory[%d]=%d\n",state.numMemory,state.mem[state.numMemory]);  
         }
     }
-    rewind(filePtr);
-
     /* read in file to check where is halt and insert .fill value*/
     //state.numMemory = address
     //state.mem[state.numMemory] = machine code
     int keyvalpt =0;
     int hlted =0;
-    for(state.numMemory =0;fgets(line,MAXLINELENGTH,filePtr)!=NULL;state.numMemory++){
-        if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
-            printf("error in reading address %d\n", state.numMemory);
-            exit(1);
-         }else{
-             char *bipo;
-             bipo=decimalToBinary(state.mem[state.numMemory]);
-             if((bipo[7]=='1')&&bipo[8]=='1'&&(bipo[9]=='0')){
-             hlted =1;
-             continue;
+    for(int i=0;i<state.numMemory;i++){
+            char *bipo;
+            bipo=decimalToBinary(state.mem[i]);
+            if((bipo[7]=='1')&&bipo[8]=='1'&&(bipo[9]=='0')){
+                hlted =1;
+                continue;
             }
             if(hlted == 1){
-            keyValueList[keyvalpt].address = state.numMemory;
-            keyValueList[keyvalpt].value =  state.mem[state.numMemory];
-            keyvalpt++;
+                keyValueList[keyvalpt].address = i;
+                keyValueList[keyvalpt].value =  state.mem[i];
+                keyvalpt++;
             }
-        }
+        
     }
 
-    for(int i=0;i<keyvalpt;i++){
-        printf("%d\n",keyValueList[i].address);
-        printf("%d\n",keyValueList[i].value);
-    }
-    rewind(filePtr);
+    // for(int i=0;i<keyvalpt;i++){
+    //     printf("%d\n",keyValueList[i].address);
+    //     printf("%d\n",keyValueList[i].value);
+    // }
 
     /* read in the entire machine-code file into memory */
     for (int i = 0; i < NUMREGS; i++) {
         state.reg[i] = 0;  // Set all registers to 0
     }
 
-    for(int a=0;a<3;a++){
-        //printState(&state);
-        for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;state.numMemory++) {
+    int endOfPro = 0;
+        for (state.pc=0;endOfPro!=1;state.pc++) {
             char *bipo;
-            if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
-                printf("error in reading address %d\n", state.numMemory);
-                exit(1);
-            }
-            //printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
-        
-            //printf("biToDec :%s\n",decimalToBinary(state.mem[state.numMemory]));
-            bipo=decimalToBinary(state.mem[state.numMemory]);
-
+            bipo=decimalToBinary(state.mem[state.pc]);
+            printf("%s\n",bipo);
             if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
             {
+                printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
                 rs[1]=bipo[11];
@@ -115,88 +101,86 @@ int main(int argc, char *argv[])
                 for (int i = 0 ; i>13 ; i++){
                     bit15to3[i] = '0';
                 }
-                int DecRs = binaryToDecimal(rs);
-                int DecRt = binaryToDecimal(rt);
-                int DestReg = DecRs+DecRt;
-                char* Rd = decimalToBinary(DestReg);
-                char rd[4];
-                rd[2]=Rd[31];
-                rd[1]=Rd[30];
-                rd[0]=Rd[29];
-                printf("add %s,%s,%s\n",rs,rt,rd);
-
-            }
-            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
-            {
-                char rs[4];
-                rs[2]=bipo[12];
-                rs[1]=bipo[11];
-                rs[0]=bipo[10];
-                char rt[4];
-                rt[2]=bipo[15];
-                rt[1]=bipo[14];
-                rt[0]=bipo[13];
                 char rd[4];
                 rd[2]=bipo[31];
                 rd[1]=bipo[30];
                 rd[0]=bipo[29];
-                for(int i=0; i<3; i++)
-                { 
-                    if(rs[i]=='1' && rt[i]=='1'){
-                    rd[i]='0';
-                    }else rd[i]='1';
-                }
+                
+                continue;
+            }
+            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
+            {
+                // char rs[4];
+                // rs[2]=bipo[12];
+                // rs[1]=bipo[11];
+                // rs[0]=bipo[10];
+                // char rt[4];
+                // rt[2]=bipo[15];
+                // rt[1]=bipo[14];
+                // rt[0]=bipo[13];
+                // char rd[4];
+                // rd[2]=bipo[31];
+                // rd[1]=bipo[30];
+                // rd[0]=bipo[29];
+                // for(int i=0; i<3; i++)
+                // { 
+                //     if(rs[i]=='1' && rt[i]=='1'){
+                //     rd[i]='0';
+                //     }else rd[i]='1';
+                // }
+                continue;
             }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='0'))//lw
             {   
+                printState(&state);
+                printf("lw\n");
                 char rs[4];
                 rs[2]=bipo[12];
                 rs[1]=bipo[11];
                 rs[0]=bipo[10];
+                
                 char rt[4];
                 rt[2]=bipo[15];
                 rt[1]=bipo[14];
                 rt[0]=bipo[13];
+
                 char offset[17];
                 for(int i=16;i<32;i++){
                     offset[i-16]=bipo[i];
                 }
-                //printf("%s\n",rs);
-                //printf("%s\n",rt);
-                //printf("%s\n",offset);
 
-                 for(int i=0;i<keyvalpt;i++){
-                     if(keyValueList[i].address==binaryToDecimal(offset)){
-                        printf("%d\n",keyValueList[i].value);
-                        break;
-                     }
-                 }
-                int asd = binaryToDecimalSign("1111111111111110");
-                printf("%d\n",asd);
+                int dest = binaryToDecimal(rt);
+                int rss = state.reg[binaryToDecimal(rs)];
+                int offseti = binaryToDecimalSign(offset);
+                int src = rss + offseti;
+                state.reg[dest] = state.mem[src];
+                continue;
             }
-            // else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
-            // {
-
-            // }else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
-            // {
-
-            // }else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
-            // {
-
-            // }else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
-            // {
-
-            // }
-            // else ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
+            //  else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
+            //  {
+            //     break;
+            //  }
+            //  else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
+            //  {
+            //     break;
+            //  }
+            //  else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
+            //  {
+            //     break;
+            //  }
+            else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
+             {
+                printState(&state);
+                endOfPro =1;
+                continue;
+             }
+             else if ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
+             {
+                printState(&state);
+                continue;
+             }
 
         }
-        rewind(filePtr);
-    }
-
-
-
-
-    
 
     return(0);
 }
@@ -273,7 +257,6 @@ int binaryToDecimalSign(char *biString) {
     int decimal = 0;
     char binaryString[16];
     strcpy(binaryString,biString);
-    printf("%s\n",binaryString);
     if(binaryString[0]=='1'){
         for (int i = 1; i < 16; i++) {
             if(binaryString[i]=='0') binaryString[i] = '1';
@@ -312,5 +295,11 @@ int binaryToDecimalSign(char *biString) {
     return decimal;
 }
 
+int isNumber(char *string)
+{
+    /* return 1 if string is a number */
+    int i;
+    return( (sscanf(string, "%d", &i)) == 1);
+}
 
 
