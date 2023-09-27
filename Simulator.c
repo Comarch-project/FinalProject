@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
             printf("%s\n",bipo);
-            if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
+            if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//add
             {
                 printState(&state);
                 char rs[4];
@@ -113,26 +113,56 @@ int main(int argc, char *argv[])
     
                 continue;
             }
-            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
+            else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//nand
             {
-                // char rs[4];
-                // rs[2]=bipo[12];
-                // rs[1]=bipo[11];
-                // rs[0]=bipo[10];
-                // char rt[4];
-                // rt[2]=bipo[15];
-                // rt[1]=bipo[14];
-                // rt[0]=bipo[13];
-                // char rd[4];
-                // rd[2]=bipo[31];
-                // rd[1]=bipo[30];
-                // rd[0]=bipo[29];
-                // for(int i=0; i<3; i++)
-                // { 
-                //     if(rs[i]=='1' && rt[i]=='1'){
-                //     rd[i]='0';
-                //     }else rd[i]='1';
-                // }
+                char rs[4];
+                rs[2]=bipo[12];
+                rs[1]=bipo[11];
+                rs[0]=bipo[10];
+                char rt[4];
+                rt[2]=bipo[15];
+                rt[1]=bipo[14];
+                rt[0]=bipo[13];
+                char rd[4];
+                rd[2]=bipo[31];
+                rd[1]=bipo[30];
+                rd[0]=bipo[29];
+
+                // get value from regA and convert to binary format, all printf is tester
+                int Decrss = state.reg[binaryToDecimal(rs)];
+                printf(":%d\n", Decrss);
+                char *birs = decimalToBinary(Decrss);
+                printf("bi%s\n", birs);
+                //create array contain binary of values that we take from regA to use in nand operation(check per bit)
+                char rss[32];
+
+                // get value from regB and convert to binary format, all printf is tester
+                int Decrtt = state.reg[binaryToDecimal(rt)];
+                printf(":%d\n", Decrtt);
+                char *birt = decimalToBinary(Decrtt);
+                printf("bi%s\n", birt);
+                //create array contain binary of values that we take from regB to use in nand operation(check per bit)
+                char rtt[32];
+                //make array containing binary of solutions from nand op
+                char rdd[32];
+                // assign each values bit by bit 
+                for(int i=0;i<32;i++){
+                    rss[i]=birs[i];
+                    printf("i:%c\n", rss[i]);
+                    rtt[i]=birt[i];
+                    printf("iiiiiiiii:%c\n", rtt[i]);
+                }
+                // nand operation
+                for(int i=0;i<32;i++){
+                    if(rss[i]=='1'&&rtt[i]=='1') rdd[i]='0';
+                    else rdd[i]='1';
+                }rdd[32] = '\0';
+                //test ; is sol correct?
+                printf("final RS1 : %s\n", birs);
+                printf("final RS2 : %s\n", birt);
+                printf("final Rd  : %s\n", rdd);
+
+
                 continue;
             }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='0'))//lw
