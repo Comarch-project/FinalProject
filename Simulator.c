@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
 
             if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
             {
+                printf("KOOOOOOOOOOOOOOOOOOOOOOO");
                 char rs[4];
                 rs[2]=bipo[12];
                 rs[1]=bipo[11];
@@ -110,11 +111,20 @@ int main(int argc, char *argv[])
                 rt[2]=bipo[15];
                 rt[1]=bipo[14];
                 rt[0]=bipo[13];
-                char rd[4];
-                rd[2]=bipo[31];
-                rd[1]=bipo[30];
-                rd[0]=bipo[29];
-                //printf("add %s,%s,%s",rs,rt,rd);
+                char bit15to3[14];
+                for (int i = 0 ; i>13 ; i++){
+                    bit15to3[i] = '0';
+                }
+                // char rd[4];
+                // rd[2]=bipo[31];
+                // rd[1]=bipo[30];
+                // rd[0]=bipo[29];
+                int DecRs = binaryToDecimal(rs);
+                int DecRt = binaryToDecimal(rt);
+                int DestReg = DecRs+DecRt;
+                char Rd = decimalToBinary(DestReg);
+                
+                printf("add %s,%s,%s",rs,rt,Rd);
 
             }
             // else if(!strcmp(bipo[7],"0") && !strcmp(bipo[8],"0") && !strcmp(bipo[9],"1"))//nand
