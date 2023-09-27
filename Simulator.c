@@ -97,15 +97,20 @@ int main(int argc, char *argv[])
                 rt[2]=bipo[15];
                 rt[1]=bipo[14];
                 rt[0]=bipo[13];
-                char bit15to3[14];
-                for (int i = 0 ; i>13 ; i++){
-                    bit15to3[i] = '0';
-                }
                 char rd[4];
                 rd[2]=bipo[31];
                 rd[1]=bipo[30];
                 rd[0]=bipo[29];
-                
+                char bit15to3[14];
+                for (int i = 0 ; i>13 ; i++){
+                    bit15to3[i] = '0';
+                }
+                int DecRs = binaryToDecimal(rs);
+                int DecRt = binaryToDecimal(rt);
+                int DestRd = binaryToDecimal(rd);
+                int DestReg = DecRs+DecRt;
+                state.reg[DestRd] = state.reg[DecRs]+state.reg[DecRt];
+    
                 continue;
             }
             else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
