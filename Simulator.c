@@ -69,8 +69,8 @@ int main(int argc, char *argv[])
     }
 
     for(int i=0;i<keyvalpt;i++){
-        printf("%d\n",keyValueList[i].address);
-        printf("%d\n",keyValueList[i].value);
+        printf("address:[%d]->value:%d\n",keyValueList[i].address,keyValueList[i].value);
+        
     }
     rewind(filePtr);
     /* read in the entire machine-code file into memory */
