@@ -149,17 +149,37 @@ int main(int argc, char *argv[])
                     offset[i-16]=bipo[i];
                 }
 
-                int dest = binaryToDecimal(rt);
-                int rss = state.reg[binaryToDecimal(rs)];
+                int regB = binaryToDecimal(rt);
+                int regA = state.reg[binaryToDecimal(rs)];
                 int offseti = binaryToDecimalSign(offset);
-                int src = rss + offseti;
-                state.reg[dest] = state.mem[src];
+                int src = regA + offseti;
+                state.reg[regB] = state.mem[src];
                 continue;
             }
-            //  else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
-            //  {
-            //     break;
-            //  }
+              else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
+              {
+                printState(&state);
+                char rs[4];
+                rs[2]=bipo[12];
+                rs[1]=bipo[11];
+                rs[0]=bipo[10];
+                
+                char rt[4];
+                rt[2]=bipo[15];
+                rt[1]=bipo[14];
+                rt[0]=bipo[13];
+
+                char offset[17];
+                for(int i=16;i<32;i++){
+                    offset[i-16]=bipo[i];
+                }
+                int regB = binaryToDecimal(rt);
+                int regA = state.reg[binaryToDecimal(rs)];
+                int offseti = binaryToDecimalSign(offset);
+                int src = regA + offseti;
+                state.reg[src] = state.mem[regB];
+                continue;
+              }
               else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
               {
                 printState(&state);
@@ -177,8 +197,8 @@ int main(int argc, char *argv[])
                 for(int i=16;i<32;i++){
                     offset[i-16]=bipo[i];
                 }
-                int argA = state.reg[binaryToDecimal(rt)];
-                int argB = state.reg[binaryToDecimal(rs)];
+                int argB = state.reg[binaryToDecimal(rt)];
+                int argA = state.reg[binaryToDecimal(rs)];
                 int offseti = binaryToDecimalSign(offset);
                 if(argA == argB){
                     //insert action here
@@ -187,10 +207,32 @@ int main(int argc, char *argv[])
                 continue;
 
               }
-            //  else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
-            //  {
-            //     break;
-            //  }
+             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
+             {
+                char rs[4];
+                rs[2]=bipo[12];
+                rs[1]=bipo[11];
+                rs[0]=bipo[10];
+                
+                char rt[4];
+                rt[2]=bipo[15];
+                rt[1]=bipo[14];
+                rt[0]=bipo[13];
+
+                char offset[17];
+                for(int i=16;i<32;i++){
+                    offset[i-16]=bipo[i];
+                }
+                int regA=state.reg[binaryToDecimal(rs)];
+                int regB=state.reg[binaryToDecimal(rt)];
+                
+                if(regA==regB){
+                    regB=state.mem[state.pc+1];
+                    state.pc=state.pc+1;
+                }else 
+                regB=state.mem[state.pc+1];
+                state.pc=state.mem[state.reg[regA]];
+             }
             else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
              {
                 printState(&state);
