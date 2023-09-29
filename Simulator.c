@@ -230,11 +230,12 @@ int main(int argc, char *argv[])
                 int regB=state.reg[binaryToDecimal(rt)];
                 
                 if(regA==regB){
-                    regB=state.mem[state.pc+1];
-                    state.pc=state.pc+1;
-                }else 
-                regB=state.mem[state.pc+1];
-                state.pc=state.mem[state.reg[regA]];
+                    state.reg[regB]=state.pc+1;
+                }else{
+                    state.reg[regB]=state.pc+1;
+                    state.pc=state.reg[regA];
+                } 
+                continue;
              }
             else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
              {
