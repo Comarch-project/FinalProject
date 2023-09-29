@@ -425,7 +425,8 @@ char* decToBiSign16b(char *string) {
         binaryStr[16] = '\0'; // Null-terminate the string
         // Perform two's complement to get the negative binary representation
         for (int i = 0; i < 16; i++) {
-            binaryStr[i] = (binaryStr[i] == '0') ? '1' : '0'; // Invert bits
+            if(binaryStr[i]=='0') binaryStr[i] = '1';
+            else if(binaryStr[i]=='1') binaryStr[i] = '0';
         }
         int carry = 1; // Initialize carry to 1 for addition
         for (int i = 16 - 1; i >= 0; i--) {
@@ -487,7 +488,8 @@ char* decToBiSign32b(char *string) {
         binaryStr[32] = '\0'; // Null-terminate the string
         // Perform two's complement to get the negative binary representation
         for (int i = 0; i < 32; i++) {
-            binaryStr[i] = (binaryStr[i] == '0') ? '1' : '0'; // Invert bits
+            if(binaryStr[i]=='0') binaryStr[i] = '1';
+            else if(binaryStr[i]=='1') binaryStr[i] = '0';
         }
         int carry = 1; // Initialize carry to 1 for addition
         for (int i = 32 - 1; i >= 0; i--) {

@@ -55,19 +55,14 @@ int main(int argc, char *argv[])
     /* read in file to check where is halt and insert .fill value*/
     //state.numMemory = address
     //state.mem[state.numMemory] = machine code
-    int keyvalpt =0;
+ 
     int hlted =0;
     for(int i=0;i<state.numMemory;i++){
             char *bipo;
             bipo=decimalToBinary(state.mem[i]);
             if((bipo[7]=='1')&&bipo[8]=='1'&&(bipo[9]=='0')){
-                hlted =1;
+                hlted =i+1;
                 continue;
-            }
-            if(hlted == 1){
-                keyValueList[keyvalpt].address = i;
-                keyValueList[keyvalpt].value =  state.mem[i];
-                keyvalpt++;
             }
         
     }
@@ -89,7 +84,6 @@ int main(int argc, char *argv[])
             printf("%s\n",bipo);
             if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
             {
-                printf("addddddddddddddddddd");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -109,7 +103,7 @@ int main(int argc, char *argv[])
                 int DestRd = binaryToDecimal(rd);
 
                 state.reg[DestRd] = state.reg[DecRs]+state.reg[DecRt];
-    
+
                 continue;
             }
             else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
@@ -220,13 +214,12 @@ int main(int argc, char *argv[])
                 int argA = state.reg[binaryToDecimal(rt)];
                 int argB = state.reg[binaryToDecimal(rs)];
                 int offseti = binaryToDecimalSign(offset);
-                int pc = state.pc;
                 if(argA == argB){
                     //insert action here
-                    state.pc = pc+offseti;
-                    printState(&state);
+                    state.pc = state.pc+offseti;
                 }
-                
+                char gg;
+                 scanf("%c",&gg);
                 continue;
 
               }
@@ -247,7 +240,7 @@ int main(int argc, char *argv[])
              }
 
         }
-
+    printState(&state);
     return(0);
 }
 
@@ -326,10 +319,10 @@ int binaryToDecimalSign(char *biString) {
     if(binaryString[0]=='1'){
         for (int i = 1; i < 16; i++) {
             if(binaryString[i]=='0') binaryString[i] = '1';
-            if(binaryString[i]=='1') binaryString[i] = '0';
+            else if(binaryString[i]=='1') binaryString[i] = '0';
         }
         int carry = 1; // Initialize carry to 1 for addition
-        for (int i = 15 - 1; i >= 1; i--) {
+        for (int i = 16-1; i >= 1; i--) {
             if (binaryString[i] == '0' && carry == 1) {
                 binaryString[i] = '1';
                 carry = 0; // No need to carry anymore
@@ -337,7 +330,6 @@ int binaryToDecimalSign(char *biString) {
                 binaryString[i] = '0'; // Carry over to the next bit
             }
         }
-        
         for (int i = 1; i < 16; i++) {
             if (binaryString[i] == '1') {
                 decimal += 1 << (16 - 1 - i);
