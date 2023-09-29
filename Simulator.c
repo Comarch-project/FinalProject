@@ -6,6 +6,7 @@
 #define MAXLINELENGTH 1000
 
 char* decimalToBinary(int);
+int binaryToDecimal(char *);
 int binaryToDecimalSign(char *);
      
 typedef struct stateStruct {
@@ -202,7 +203,29 @@ int main(int argc, char *argv[])
               else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
               {
                 printState(&state);
+                char rs[4];
+                rs[2]=bipo[12];
+                rs[1]=bipo[11];
+                rs[0]=bipo[10];
+                
+                char rt[4];
+                rt[2]=bipo[15];
+                rt[1]=bipo[14];
+                rt[0]=bipo[13];
+
+                char offset[17];
+                for(int i=16;i<32;i++){
+                    offset[i-16]=bipo[i];
+                }
+                int regA = binaryToDecimal(rs);
+                int regB = binaryToDecimal(rt);
+                int offseti = binaryToDecimalSign(offset);
+                if(regA == regB){
+                    //insert action here
+                }
+                
                 continue;
+
               }
             //  else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
             //  {
