@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
                 state.reg[regB] = state.mem[src];
                 continue;
             }
-              else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
+            else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
               {
                 printState(&state);
                 char rs[4];
@@ -176,11 +176,14 @@ int main(int argc, char *argv[])
                 int regB = binaryToDecimal(rt);
                 int regA = state.reg[binaryToDecimal(rs)];
                 int offseti = binaryToDecimalSign(offset);
-                int src = regA + offseti;
-                state.reg[src] = state.mem[regB];
+                int memaddr = regA+offseti;
+                while(state.numMemory<=memaddr){
+                    state.numMemory++;
+                }
+                state.mem[memaddr]=state.reg[regB];
                 continue;
               }
-              else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
+            else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
               {
                 printState(&state);
                 char rs[4];
@@ -207,7 +210,7 @@ int main(int argc, char *argv[])
                 continue;
 
               }
-             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
+            else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
              {
                 char rs[4];
                 rs[2]=bipo[12];
@@ -239,7 +242,7 @@ int main(int argc, char *argv[])
                 endOfPro =1;
                 continue;
              }
-             else if ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
+            else if ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
              {
                 printState(&state);
                 continue;
