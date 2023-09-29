@@ -8,6 +8,8 @@
 char* decimalToBinary(int);
 int binaryToDecimal(char *);
 int binaryToDecimalSign(char *);
+char* nand(char * ,char * );
+char* decimalToBinaryFlex(int ) ;
      
 typedef struct stateStruct {
     int pc;
@@ -16,10 +18,6 @@ typedef struct stateStruct {
     int numMemory;
 } stateType;
 
-struct KeyValuePair {
-    int value;
-    int address;
-};
 void printState(stateType *);
 
 int main(int argc, char *argv[])
@@ -27,11 +25,6 @@ int main(int argc, char *argv[])
     char line[MAXLINELENGTH];
     stateType state;
     FILE *filePtr;
-
-    // Define the maximum number of key-value pairs in the list
-    int maxPairs = 32;
-    // Create an array of KeyValuePair structs to store the data
-    struct KeyValuePair keyValueList[maxPairs];
     
     if (argc != 2) {
 	printf("error: usage: %s <machine-code file>\n", argv[0]);
@@ -55,22 +48,6 @@ int main(int argc, char *argv[])
     /* read in file to check where is halt and insert .fill value*/
     //state.numMemory = address
     //state.mem[state.numMemory] = machine code
- 
-    int hlted =0;
-    for(int i=0;i<state.numMemory;i++){
-            char *bipo;
-            bipo=decimalToBinary(state.mem[i]);
-            if((bipo[7]=='1')&&bipo[8]=='1'&&(bipo[9]=='0')){
-                hlted =i+1;
-                continue;
-            }
-        
-    }
-
-    // for(int i=0;i<keyvalpt;i++){
-    //     printf("%d\n",keyValueList[i].address);
-    //     printf("%d\n",keyValueList[i].value);
-    // }
 
     /* read in the entire machine-code file into memory */
     for (int i = 0; i < NUMREGS; i++) {
@@ -79,6 +56,7 @@ int main(int argc, char *argv[])
 
     int endOfPro = 0;
         for (state.pc=0;endOfPro!=1;state.pc++) {
+            if(state.reg[0]!=0) state.reg[0]=0;
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
             printf("%s\n",bipo);
@@ -122,46 +100,34 @@ int main(int argc, char *argv[])
                 rd[1]=bipo[30];
                 rd[0]=bipo[29];
 
-                // get value from regA and convert to binary format, all printf is tester
-                int Decrss = state.reg[binaryToDecimal(rs)];
-                printf(":%d\n", Decrss);
-                char *birs = decimalToBinary(Decrss);
-                printf("bi%s\n", birs);
-                //create array contain binary of values that we take from regA to use in nand operation(check per bit)
-                char rss[33];
-
-                // get value from regB and convert to binary format, all printf is tester
-                int Decrtt = state.reg[binaryToDecimal(rt)];
-                printf(":%d\n", Decrtt);
-                char *birt = decimalToBinary(Decrtt);
-                printf("bi%s\n", birt);
-                //create array contain binary of values that we take from regB to use in nand operation(check per bit)
-                char rtt[33];
-                
-                int dest = binaryToDecimal(rd);
-                //make array containing binary of solutions from nand op
-                char rdd[33];
-                // assign each values bit by bit 
-                for(int i=0;i<32;i++){
-                    rss[i]=birs[i];
-                    printf("i:%c\n", rss[i]);
-                    rtt[i]=birt[i];
-                    printf("iiiiiiiii:%c\n", rtt[i]);
+                int rsi = state.reg[binaryToDecimal(rs)];
+                int rti = state.reg[binaryToDecimal(rt)];
+                int rdi = binaryToDecimal(rd);
+                char* biOfrsi = decimalToBinaryFlex(rsi);
+                printf(">>>>>>>>%s\n",biOfrsi);
+                char* biOfrti = decimalToBinaryFlex(rti);
+                printf(">>>>>>>>%s\n",biOfrti);
+                char* res = nand(biOfrsi,biOfrti);
+                int lenOfres = strlen(res);
+                char *res16b = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
+                for (int i = 16 - 1; i >= 0; i--) {
+                    res16b[i] = '0'; 
                 }
-                // nand operation
-                for(int i=0;i<32;i++){
-                    if(rss[i]=='1'&&rtt[i]=='1') rdd[i]='0';
-                    else rdd[i]='1';
-                }
-                rdd[32] = '\0';
-               
-                int sol=binaryToDecimalSign(rdd);
-                //test ; is sol correct?
-                printf("final RS1 : %s\n", birs);
-                printf("final RS2 : %s\n", birt);
-                printf("final Rd  : %s\n", rdd);
-                printf("sol : %d\n", sol);
+                res16b[16] = '\0';
+                for (int i = 16 - 1; i >= 0; i--) {
+                    if(res[lenOfres-1]=='1') res16b[i] = '1'; 
+                    else res16b[i] = '0'; 
 
+                    lenOfres--;
+                    if(lenOfres<0) break;
+                }
+                int saveAtReg = binaryToDecimalSign(res16b);
+                printf(">>>>>>>>+%s\n",res16b);
+                printf(">>>>>>>>%d\n",saveAtReg);
+
+                state.reg[rdi] = saveAtReg;
+                free(biOfrsi);
+                free(biOfrti);
                 continue;
             }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='0'))//lw
@@ -218,8 +184,6 @@ int main(int argc, char *argv[])
                     //insert action here
                     state.pc = state.pc+offseti;
                 }
-                char gg;
-                 scanf("%c",&gg);
                 continue;
 
               }
@@ -261,7 +225,6 @@ void printState(stateType *statePtr)
 }
 
 char* decimalToBinary(int n) {
-    
    char *binaryStr = (char *)malloc((32 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 32 - 1; i >= 0; i--) {
     binaryStr[i] = '0'; 
@@ -277,7 +240,8 @@ char* decimalToBinary(int n) {
         binaryStr[32] = '\0'; // Null-terminate the string
         // Perform two's complement to get the negative binary representation
         for (int i = 0; i < 32; i++) {
-            binaryStr[i] = (binaryStr[i] == '0') ? '1' : '0'; // Invert bits
+            if(binaryStr[i]=='0') binaryStr[i] = '1';
+            else if(binaryStr[i]=='1') binaryStr[i] = '0'; // Invert bits
         }
         int carry = 1; // Initialize carry to 1 for addition
         for (int i = 32 - 1; i >= 0; i--) {
@@ -353,11 +317,140 @@ int binaryToDecimalSign(char *biString) {
     return decimal;
 }
 
-int isNumber(char *string)
-{
-    /* return 1 if string is a number */
-    int i;
-    return( (sscanf(string, "%d", &i)) == 1);
+int binaryToDecimalSign32b(char *biString) {
+    int decimal = 0;
+    char binaryString[32];
+    strcpy(binaryString,biString);
+    if(binaryString[0]=='1'){
+        for (int i = 1; i < 32; i++) {
+            if(binaryString[i]=='0') binaryString[i] = '1';
+            else if(binaryString[i]=='1') binaryString[i] = '0';
+        }
+        int carry = 1; // Initialize carry to 1 for addition
+        for (int i = 32-1; i >= 1; i--) {
+            if (binaryString[i] == '0' && carry == 1) {
+                binaryString[i] = '1';
+                carry = 0; // No need to carry anymore
+            } else if (binaryString[i] == '1' && carry == 1) {
+                binaryString[i] = '0'; // Carry over to the next bit
+            }
+        }
+        for (int i = 1; i < 32; i++) {
+            if (binaryString[i] == '1') {
+                decimal += 1 << (32 - 1 - i);
+            } else if (binaryString[i] != '0') {
+                printf("Invalid binary input: %c\n", binaryString[i]);
+                return -1; // Error: Invalid character in binary string
+            }
+
+        }
+        decimal = -decimal;
+    }else{
+        for (int i = 1; i < 32; i++) {
+            if (binaryString[i] == '1') {
+                decimal += 1 << (32 - 1 - i);
+            } else if (binaryString[i] != '0') {
+                printf("Invalid binary input: %c\n", binaryString[i]);
+                return -1; // Error: Invalid character in binary string
+            }
+        }
+    }
+    return decimal;
 }
 
+char* decimalToBinaryFlex(int n) {
+    // Calculate the number of bits required to represent the binary number
+    int numBits = 0;
+    long int temp = n;
+    while (temp > 0) {
+        temp /= 2;
+        numBits++;
+    }
+    char *binaryStr = (char *)malloc((numBits + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = numBits - 1; i >= 0; i--) {
+    binaryStr[i] = '0'; 
+    }
+    // Handle negative numbers
+    if (n < 0) {
+        n = -n;  // Make n positive
+        // Convert the absolute value of n to binary and store it in binaryStr
+        for (int i = 16 - 1; i >= 0; i--) {
+            binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+            n = n / 2;
+        }
+        binaryStr[16] = '\0'; // Null-terminate the string
+        // Perform two's complement to get the negative binary representation
+        for (int i = 0; i < 16; i++) {
+            if(binaryStr[i]=='0') binaryStr[i] = '1';
+            else if(binaryStr[i]=='1') binaryStr[i] = '0';// Invert bits
+        }
+        int carry = 1; // Initialize carry to 1 for addition
+        for (int i = 16 - 1; i >= 0; i--) {
+            if (binaryStr[i] == '0' && carry == 1) {
+                binaryStr[i] = '1';
+                carry = 0; // No need to carry anymore
+            } else if (binaryStr[i] == '1' && carry == 1) {
+                binaryStr[i] = '0'; // Carry over to the next bit
+            }
+        }
+    }else{
+    // Convert the decimal number to binary and store it in binaryStr
+        for (int i = numBits - 1; i >= 0; i--) {
+        binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
+        n = n / 2;
+        }
+    binaryStr[numBits] = '\0';
+    }
+    return binaryStr;
+}
 
+char* nand(char *a,char *b){
+    int alen = strlen(a);
+    int blen = strlen(b);
+    int maxstrlen;
+    if(alen>=blen){
+        maxstrlen=alen;
+    }else{
+        maxstrlen=blen;
+    }
+    char *ret = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = maxstrlen -(maxstrlen-alen)- 1; i >= 0; i--) {
+        ret[i] = '0'; 
+    }
+    char *regA = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = maxstrlen - 1; i >= 0; i--) {
+    regA[i] = '0'; 
+    }
+    regA[maxstrlen] = '\0';
+    for (int i = maxstrlen - 1; i >= 0; i--) {
+        if(a[alen-1]=='1') regA[i] = '1'; 
+        else regA[i] = '0'; 
+
+        alen--;
+        if(alen<0) break;
+    }
+
+    char *regB = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = maxstrlen - 1; i >= 0; i--) {
+    regB[i] = '0'; 
+    }
+    regB[maxstrlen] = '\0';
+    for (int i = maxstrlen - 1; i >= 0; i--) {
+        if(b[blen-1]=='1') regB[i] = '1'; 
+        else regB[i] = '0'; 
+
+        blen--;
+        if(blen<0) break;
+    }
+    printf("%s??%s\n",regA,regB);
+
+    for(int i=0;i<maxstrlen;i++){
+        if(regA[i]=='1'&&regB[i]=='1'){
+            ret[i]='0';
+        }else{
+            ret[i]='1';
+        }
+    }
+    ret[maxstrlen] = '\0';
+    return ret;
+}
