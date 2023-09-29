@@ -217,11 +217,14 @@ int main(int argc, char *argv[])
                 for(int i=16;i<32;i++){
                     offset[i-16]=bipo[i];
                 }
-                int regA = binaryToDecimal(rs);
-                int regB = binaryToDecimal(rt);
+                int argA = state.reg[binaryToDecimal(rt)];
+                int argB = state.reg[binaryToDecimal(rs)];
                 int offseti = binaryToDecimalSign(offset);
-                if(regA == regB){
+                int pc = state.pc;
+                if(argA == argB){
                     //insert action here
+                    state.pc = pc+offseti;
+                    printState(&state);
                 }
                 
                 continue;
