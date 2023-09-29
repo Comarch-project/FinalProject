@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
                     state.reg[regB]=state.pc+1;
                 }else{
                     state.reg[regB]=state.pc+1;
-                    state.pc=state.reg[regA];
+                    state.pc=state.reg[regA]-1;
                 } 
                 continue;
              }
