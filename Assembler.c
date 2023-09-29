@@ -19,8 +19,8 @@ struct KeyValuePair {
 };
 int main(int argc, char *argv[]) //argv = argument vector, argc = argument count 
 {
-    char *inFileString, *outFileString;
-    FILE *inFilePtr, *outFilePtr;
+    char *inFileString, *outFileString,*outFileStringSim;
+    FILE *inFilePtr, *outFilePtr,*outFilePtrSim;
     char label[MAXLINELENGTH], opcode[MAXLINELENGTH], arg0[MAXLINELENGTH],
             arg1[MAXLINELENGTH], arg2[MAXLINELENGTH];
     char binaryOp[4];
@@ -31,14 +31,15 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     // Create an array of KeyValuePair structs to store the data
     struct KeyValuePair keyValueList[maxPairs];
 
-    if (argc != 3) { 
-        printf("error: usage: %s <assembly-code-file> <machine-code-file>\n",
+    if (argc != 4) { 
+        printf("error: usage: %s <assembly-code-file> <machine-code-file> <machine-code-simulator-file>\n",
             argv[0]);
         exit(1);
     }
 
     inFileString = argv[1];
     outFileString = argv[2];
+    outFileStringSim = argv[3];
 
     inFilePtr = fopen(inFileString, "r");                        //เปิดไฟล์
     if (inFilePtr == NULL) {                                     // ถ้า ไฟล์ว่าง
@@ -48,6 +49,12 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     outFilePtr = fopen(outFileString, "w");
     if (outFilePtr == NULL) {
         printf("error in opening %s\n", outFileString);
+        exit(1);
+    }
+
+    outFilePtrSim = fopen(outFileStringSim, "w");
+    if (outFilePtrSim == NULL) {
+        printf("error in opening %s\n", outFileStringSim);
         exit(1);
     }
 
@@ -317,7 +324,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             }
             printf("biCode: %s\n",biCode);
             strcpy(binaryMachCode,biCode);
-            biToHex4fill(biCode,outFilePtr,linecnt,value);
+            biToHex4fill(biCode,outFilePtr,outFilePtrSim,linecnt,value);
         }
         //char *biResult = decToBiUnsign(arg2);
         // char *biResult = decToBiSign16b(arg2);
@@ -325,7 +332,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         printf("binaryOp: %s\n",binaryOp);
         printf("address : %d\n",linecnt);
         printf("biMachCode: %s \n",binaryMachCode);
-        if(strcmp(opcode, ".fill")) biToHex(binaryMachCode,outFilePtr,linecnt);
+        if(strcmp(opcode, ".fill")) biToHex(binaryMachCode,outFilePtr,outFilePtrSim,linecnt);
         printf("--------------------------------------------\n");
         strcpy(binaryMachCode, "00000000000000000000000000000000");
         linecnt++;
@@ -392,17 +399,19 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
-void biToHex(char bin[],FILE *str,int addr){
+void biToHex(char bin[],FILE *str,FILE *strSim,int addr){
     // Convert binary to integer using strtol
     unsigned int decimal = strtoll(bin, NULL, 2);
     fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,decimal,decimal);
+    fprintf(strSim,"%d\n",decimal);
     printf("Hexadecimal: %X\n", decimal);         //write to text here
 }
 
-void biToHex4fill(char bin[],FILE *str,int addr,int val){
+void biToHex4fill(char bin[],FILE *str,FILE *strSim,int addr,int val){
     // Convert binary to integer using strtol
     unsigned int decimal = strtoll(bin, NULL, 2);
-    fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,val,decimal);
+    fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,val,decimal);\
+    fprintf(strSim,"%d\n", val);
     printf("Hexadecimal: %X\n", decimal);         //write to text here
 }
 
