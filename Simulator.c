@@ -223,10 +223,32 @@ int main(int argc, char *argv[])
                 continue;
 
               }
-            //  else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
-            //  {
-            //     break;
-            //  }
+             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
+             {
+                char rs[4];
+                rs[2]=bipo[12];
+                rs[1]=bipo[11];
+                rs[0]=bipo[10];
+                
+                char rt[4];
+                rt[2]=bipo[15];
+                rt[1]=bipo[14];
+                rt[0]=bipo[13];
+
+                char offset[17];
+                for(int i=16;i<32;i++){
+                    offset[i-16]=bipo[i];
+                }
+                int regA=state.reg[binaryToDecimal(rs)];
+                int regB=state.reg[binaryToDecimal(rt)];
+                
+                if(regA==regB){
+                    regB=state.mem[state.pc+1];
+                    state.pc=state.pc+1;
+                }else 
+                regB=state.mem[state.pc+1];
+                state.pc=state.mem[state.reg[regA]];
+             }
             else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
              {
                 printState(&state);
