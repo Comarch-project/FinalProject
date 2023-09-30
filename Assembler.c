@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     }
     rewind(inFilePtr);
     // Initiate value of each lable 
-    int linecnt = 0;// To indicate address
+    linecnt = 0;// To indicate address
     int keyvalpt = 0;// To indicate current size of keyValue
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){
