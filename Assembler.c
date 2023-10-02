@@ -231,6 +231,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             }else{
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
+                            if(atoi(keyValueList[i].value)>32768||atoi(keyValueList[i].key)<(-32768)){
+                            printf("Wrong offset input at line %d",linecnt+1);
+                            exit(1) ;
+                        }
                         biOff = decToBiSign16b(keyValueList[i].address,linecnt);
                         break;
                     }else if(i == keyvalpt){
@@ -295,7 +299,6 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                         int offseti = (-linecnt)-1+atoi(keyValueList[i].address);
                         char offsetc[32];
                         sprintf(offsetc, "%d", offseti);
-                        printf("%s\n",offsetc);
                         biOff = decToBiSign16b(offsetc,linecnt);
                         printf("%s\n",biOff);
                         break;

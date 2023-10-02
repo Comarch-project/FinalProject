@@ -57,11 +57,13 @@ int main(int argc, char *argv[])
     int endOfPro = 0;
         for (state.pc=0;endOfPro!=1;state.pc++) {
             if(state.reg[0]!=0) state.reg[0]=0;
+            while (getchar() != '\n'); 
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
             printf("%s\n",bipo);
             if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
             {
+                printf("ADD");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -86,6 +88,7 @@ int main(int argc, char *argv[])
             }
             else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
             {
+                printf("NAND");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -104,9 +107,9 @@ int main(int argc, char *argv[])
                 int rti = state.reg[binaryToDecimal(rt)];
                 int rdi = binaryToDecimal(rd);
                 char* biOfrsi = decimalToBinaryFlex(rsi);
-                printf(">>>>>>>>%s\n",biOfrsi);
+                printf(">>>>>>>>%s %d\n",biOfrsi, rsi);
                 char* biOfrti = decimalToBinaryFlex(rti);
-                printf(">>>>>>>>%s\n",biOfrti);
+                printf(">>>>>>>>%s %d\n",biOfrti, rti);
                 char* res = nand(biOfrsi,biOfrti);
                 int lenOfres = strlen(res);
                 char *res16b = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
@@ -132,6 +135,7 @@ int main(int argc, char *argv[])
             }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='0'))//lw
             {   
+                printf("LW");
                 printState(&state);
 
                 char rs[4];
@@ -163,6 +167,7 @@ int main(int argc, char *argv[])
             }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
               {
+                printf("SW");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -190,6 +195,7 @@ int main(int argc, char *argv[])
               }
             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
               {
+                printf("BEQ");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -208,15 +214,19 @@ int main(int argc, char *argv[])
                 int argB = state.reg[binaryToDecimal(rt)];
                 int argA = state.reg[binaryToDecimal(rs)];
                 int offseti = binaryToDecimalSign(offset);
+                printf("A%d\n",argA);
+                printf("B%d\n",argB);
                 if(argA == argB){
                     //insert action here
                     state.pc = state.pc+offseti;
+                    printf("Equal!Goto %d\n",state.pc);
                 }
                 continue;
 
               }
             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
              {
+                printf("JALR");
                 char rs[4];
                 rs[2]=bipo[12];
                 rs[1]=bipo[11];
@@ -231,25 +241,29 @@ int main(int argc, char *argv[])
                 for(int i=16;i<32;i++){
                     offset[i-16]=bipo[i];
                 }
-                int regA=state.reg[binaryToDecimal(rs)];
-                int regB=state.reg[binaryToDecimal(rt)];
-                
+                int regA=binaryToDecimal(rs);
+                int regB=binaryToDecimal(rt);
                 if(regA==regB){
                     state.reg[regB]=state.pc+1;
                 }else{
+                    printf("[regA] : %d\n",regA);
+                    printf("state.reg[regA] : %d\n",state.reg[regA]);
                     state.reg[regB]=state.pc+1;
                     state.pc=state.reg[regA]-1;
+                    printf("PC : %d\n",state.pc);
                 } 
                 continue;
              }
             else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
              {
+                printf("HALT");
                 printState(&state);
                 endOfPro =1;
                 continue;
              }
             else if ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
              {
+                printf("NOOP");
                 printState(&state);
                 continue;
              }
@@ -455,6 +469,57 @@ char* decimalToBinaryFlex(int n) {
     return binaryStr;
 }
 
+// char* nand(char *a,char *b){
+//     int alen = strlen(a);
+//     int blen = strlen(b);
+//     int maxstrlen;
+//     if(alen>=blen){
+//         maxstrlen=alen;
+//     }else{
+//         maxstrlen=blen;
+//     }
+//     char *ret = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
+//     for (int i = maxstrlen -(maxstrlen-alen)- 1; i >= 0; i--) {
+//         ret[i] = '0'; 
+//     }
+//     char *regA = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
+//     for (int i = maxstrlen - 1; i >= 0; i--) {
+//     regA[i] = '0'; 
+//     }
+//     regA[maxstrlen] = '\0';
+//     for (int i = maxstrlen - 1; i >= 0; i--) {
+//         if(a[alen-1]=='1') regA[i] = '1'; 
+//         else regA[i] = '0'; 
+
+//         alen--;
+//         if(alen<0) break;
+//     }
+
+//     char *regB = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
+//     for (int i = maxstrlen - 1; i >= 0; i--) {
+//     regB[i] = '0'; 
+//     }
+//     regB[maxstrlen] = '\0';
+//     for (int i = maxstrlen - 1; i >= 0; i--) {
+//         if(b[blen-1]=='1') regB[i] = '1'; 
+//         else regB[i] = '0'; 
+
+//         blen--;
+//         if(blen<0) break;
+//     }
+//     printf("%s??%s\n",regA,regB);
+
+//     for(int i=0;i<maxstrlen;i++){
+//         if(regA[i]=='1'&&regB[i]=='1'){
+//             ret[i]='0';
+//         }else{
+//             ret[i]='1';
+//         }
+//     }
+//     ret[maxstrlen] = '\0';
+//     return ret;
+// }
+
 char* nand(char *a,char *b){
     int alen = strlen(a);
     int blen = strlen(b);
@@ -464,16 +529,16 @@ char* nand(char *a,char *b){
     }else{
         maxstrlen=blen;
     }
-    char *ret = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
-    for (int i = maxstrlen -(maxstrlen-alen)- 1; i >= 0; i--) {
+    char *ret = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = 16 - 1; i >= 0; i--) {
         ret[i] = '0'; 
     }
-    char *regA = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
-    for (int i = maxstrlen - 1; i >= 0; i--) {
+    char *regA = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = 16 - 1; i >= 0; i--) {
     regA[i] = '0'; 
     }
-    regA[maxstrlen] = '\0';
-    for (int i = maxstrlen - 1; i >= 0; i--) {
+    regA[16] = '\0';
+    for (int i = 16 - 1; i >= 0; i--) {
         if(a[alen-1]=='1') regA[i] = '1'; 
         else regA[i] = '0'; 
 
@@ -481,12 +546,12 @@ char* nand(char *a,char *b){
         if(alen<0) break;
     }
 
-    char *regB = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
-    for (int i = maxstrlen - 1; i >= 0; i--) {
+    char *regB = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = 16 - 1; i >= 0; i--) {
     regB[i] = '0'; 
     }
-    regB[maxstrlen] = '\0';
-    for (int i = maxstrlen - 1; i >= 0; i--) {
+    regB[16] = '\0';
+    for (int i = 16 - 1; i >= 0; i--) {
         if(b[blen-1]=='1') regB[i] = '1'; 
         else regB[i] = '0'; 
 
@@ -495,13 +560,13 @@ char* nand(char *a,char *b){
     }
     printf("%s??%s\n",regA,regB);
 
-    for(int i=0;i<maxstrlen;i++){
+    for(int i=0;i<16;i++){
         if(regA[i]=='1'&&regB[i]=='1'){
             ret[i]='0';
         }else{
             ret[i]='1';
         }
     }
-    ret[maxstrlen] = '\0';
+    ret[16] = '\0';
     return ret;
 }

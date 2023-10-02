@@ -1,13 +1,18 @@
-   lw 0 2 mcand 
-   lw 0 3 mpiler
-   lw 0 4 regLoop
-   lw 0 5 nandMat
-   lw 0 6 isOne
-   nand 3 5 7
-   nand 7 7 7
-done   halt
-mcand .fill 12
-mpiler .fill 5
-regLoop .fill 15
+        lw 0 2 mcand 
+        lw 0 3 mpiler
+        lw 0 4 regLoop
+        lw 0 6 neg1
+start   lw 0 5 nandMat
+        nand 3 5 7
+        nand 7 7 7 
+        add 1 1 1
+finMul  add 3 3 3
+        beq 4 0 dne
+        add 4 6 4 
+        beq 0 0 start
+dne    halt
+mcand   .fill 12
+mpiler  .fill 32676
+regLoop .fill 14
 nandMat .fill 16384
-isOne .fill 16383
+neg1    .fill -1
