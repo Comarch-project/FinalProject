@@ -149,10 +149,15 @@ int main(int argc, char *argv[])
                     offset[i-16]=bipo[i];
                 }
 
-                int regB = binaryToDecimal(rt);
                 int regA = state.reg[binaryToDecimal(rs)];
+                printf("+++++++++++++++%d\n",regA);
+                int regB = binaryToDecimal(rt);
+                printf("+++++++++++++++%d\n",regB);
                 int offseti = binaryToDecimalSign(offset);
+                printf("+++++++++++++++%d\n",offseti);
                 int src = regA + offseti;
+                printf("+++++++++++++++%d\n",src);
+                printf("+++++++++++++++%d\n",state.mem[0]);
                 state.reg[regB] = state.mem[src];
                 continue;
             }

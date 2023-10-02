@@ -80,13 +80,17 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             strcpy(keyValueList[keyvalpt].key, label);
             if(isNumber(arg0)){
                 strcpy(keyValueList[keyvalpt].value, arg0) ;
-                strcpy(keyValueList[keyvalpt].address, itoa(linecnt,keyValueList[keyvalpt].address,50));
+                char str[20] ;
+                sprintf(str, "%d", linecnt);
+                strcpy(keyValueList[keyvalpt].address, str);
             }else{
                 int i;
                 for (i = 0; i < maxPairs; i++) {
                     if (!strcmp(keyValueList[i].key, arg0)) {
                         strcpy(keyValueList[keyvalpt].value, keyValueList[i].value);
-                        strcpy(keyValueList[keyvalpt].address, itoa(linecnt,keyValueList[keyvalpt].address,50));
+                        char str[20] ;
+                        sprintf(str, "%d", linecnt);
+                        strcpy(keyValueList[keyvalpt].address, str);
                         break;
                     }
                 }
@@ -101,14 +105,16 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             }
             strcpy(keyValueList[keyvalpt].type, opcode);
             strcpy(keyValueList[keyvalpt].key, label);
-            strcpy(keyValueList[keyvalpt].value, itoa(linecnt,keyValueList[keyvalpt].value,50));
-            strcpy(keyValueList[keyvalpt].address, itoa(linecnt,keyValueList[keyvalpt].address,50));
+            char str[20] ;
+            sprintf(str, "%d", linecnt);
+            strcpy(keyValueList[keyvalpt].value, str);
+            strcpy(keyValueList[keyvalpt].address, str);
             keyvalpt++;
         }
         linecnt++;
     }
     for (int i = 0; i < keyvalpt; i++) {
-        printf("> %s %s %s\n",keyValueList[i].key,keyValueList[i].value,keyValueList[i].address);
+        printf("> lable : %s value : %s Addr : %s\n",keyValueList[i].key,keyValueList[i].value,keyValueList[i].address);
     }
     rewind(inFilePtr);
 

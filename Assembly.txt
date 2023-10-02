@@ -1,7 +1,13 @@
-   lw 0 1 four
-   lw 0 2 two
-   nand 1 2 4
-   sw 0 2 9
-   halt
-four .fill 334
-two .fill 32
+   lw 0 2 mcand 
+   lw 0 3 mpiler
+   lw 0 4 regLoop
+   lw 0 5 nandMat
+   lw 0 6 isOne
+   nand 3 5 7
+   nand 7 7 7
+done   halt
+mcand .fill 12
+mpiler .fill 5
+regLoop .fill 15
+nandMat .fill 16384
+isOne .fill 16383
