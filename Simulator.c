@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     int endOfPro = 0;
         for (state.pc=0;endOfPro!=1;state.pc++) {
             if(state.reg[0]!=0) state.reg[0]=0;
-            while (getchar() != '\n'); 
+            //while (getchar() != '\n'); 
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
             printf("%s\n",bipo);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
                 int DecRs = binaryToDecimal(rs);
                 int DecRt = binaryToDecimal(rt);
                 int DestRd = binaryToDecimal(rd);
-
+                printf(">>>>>>>>%d + %d = %d\n",state.reg[DecRs], state.reg[DecRt],state.reg[DecRs]+state.reg[DecRt]);
                 state.reg[DestRd] = state.reg[DecRs]+state.reg[DecRt];
 
                 continue;
@@ -424,15 +424,8 @@ int binaryToDecimalSign32b(char *biString) {
 }
 
 char* decimalToBinaryFlex(int n) {
-    // Calculate the number of bits required to represent the binary number
-    int numBits = 0;
-    long int temp = n;
-    while (temp > 0) {
-        temp /= 2;
-        numBits++;
-    }
-    char *binaryStr = (char *)malloc((numBits + 1) * sizeof(char)); // +1 for the null terminator
-    for (int i = numBits - 1; i >= 0; i--) {
+    char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
+    for (int i = 16 - 1; i >= 0; i--) {
     binaryStr[i] = '0'; 
     }
     // Handle negative numbers
@@ -460,11 +453,11 @@ char* decimalToBinaryFlex(int n) {
         }
     }else{
     // Convert the decimal number to binary and store it in binaryStr
-        for (int i = numBits - 1; i >= 0; i--) {
+        for (int i = 16 - 1; i >= 0; i--) {
         binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
         n = n / 2;
         }
-    binaryStr[numBits] = '\0';
+    binaryStr[16] = '\0';
     }
     return binaryStr;
 }
