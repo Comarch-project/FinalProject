@@ -1,21 +1,28 @@
-        lw 0 2 mcand 
-        lw 0 3 mpiler
-        lw 0 4 regLoop
-        lw 0 5 nandMat
-        lw 0 6 neg1
-start   nand 3 5 7
-        nand 7 7 7 
-        add 1 1 1
-        beq 7 5 multip if reg 7 == 16384(if 15th bit is 1) 
-conMul  add 3 3 3
-        beq 4 0 done
-        add 4 6 4 
-        beq 0 0 start
-multip  add 1 2 1
-        beq 0 0 conMul
-done    halt
-mcand   .fill 32766
-mpiler  .fill 10383
-regLoop .fill 14
-nandMat .fill 16384
-neg1    .fill -1
+ lw          0           5           pos1       $5 = 1
+            lw          0           1           input      $1 = memory[input]
+            lw          0           2           subAdr   prepare to call sub4n. $2=sub4n
+            jalr         2           4                       call sub4n; $4=return address; $3=answer
+            lw          0           5           pos1       $5 = 1
+            lw          0           1           input      $1 = memory[input]
+            lw          0           2           subAdr   prepare to call sub4n. $2=sub4n
+            jalr         2           4                       call sub4n; $4=return address; $3=answer
+            halt
+sub4n     sw         7           4           stack      save return address on stack
+            add        7           5           7           increment stack pointer
+            sw         7           1           stack      save $1 on stack
+            add        7           5           7           increment stack pointer
+            add        1           1           1           compute 2*input
+            add        1           1           3           compute 4*input
+            lw          0           2           neg1       $2 = -1
+            add        7           2           7           decrement stack pointer
+            lw          7           1           stack      recover original $1
+            add        7           2           7           decrement stack pointer
+            lw          7           4           stack      recover original return address
+            jalr         4           2                       return.  $2 is not restored.
+pos1   .fill         1
+neg1   .fill         -1
+subAdr .fill         sub4n                             contains the address of sub4n
+input  .fill         10                                  input = 10
+stack  .fill    0                      beginning of stack (value is irrelevant)
+n .fill 2
+r .fill 1

@@ -53,14 +53,15 @@ int main(int argc, char *argv[])
     for (int i = 0; i < NUMREGS; i++) {
         state.reg[i] = 0;  // Set all registers to 0
     }
-
+    int insCnt=0;
     int endOfPro = 0;
         for (state.pc=0;endOfPro!=1;state.pc++) {
             if(state.reg[0]!=0) state.reg[0]=0;
-            //while (getchar() != '\n'); 
+            while (getchar() != '\n'); 
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
             printf("%s\n",bipo);
+            insCnt++;
             if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
             {
                 printf("ADD");
@@ -227,6 +228,7 @@ int main(int argc, char *argv[])
             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
              {
                 printf("JALR");
+                printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
                 rs[1]=bipo[11];
@@ -270,6 +272,7 @@ int main(int argc, char *argv[])
 
         }
     printState(&state);
+    printf(">>>Instruction used : %d<<<",insCnt);
     return(0);
 }
 
