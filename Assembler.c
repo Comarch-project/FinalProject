@@ -294,7 +294,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             if(isNumber(arg2)){
                 biOff = decToBiSign16b(arg2,linecnt);
             }else{
-                for (int i = 0; i < keyvalpt; i++) {
+                for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         int offseti = (-linecnt)-1+atoi(keyValueList[i].address);
                         char offsetc[32];

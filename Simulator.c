@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
     int n = 3;
     int r = 2;
     int com = combination(n,r);
-    printf(">>>Combination(%d,%d) : %d\n<<<",n,r,com);
+    printf(">>>Combination(%d,%d) : %d<<<\n",n,r,com);
     return(0);
 }
 
