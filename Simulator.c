@@ -8,6 +8,7 @@
 char* decimalToBinary(int);
 int binaryToDecimal(char *);
 int binaryToDecimalSign(char *);
+int combination (int,int);
 char* nand(char * ,char * );
 char* decimalToBinaryFlex(int ) ;
      
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
     int endOfPro = 0;
         for (state.pc=0;endOfPro!=1;state.pc++) {
             if(state.reg[0]!=0) state.reg[0]=0;
-            while (getchar() != '\n'); 
+            //while (getchar() != '\n'); 
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
             printf("%s\n",bipo);
@@ -272,7 +273,9 @@ int main(int argc, char *argv[])
 
         }
     printState(&state);
-    printf(">>>Instruction used : %d<<<",insCnt);
+    printf(">>>Instruction used : %d<<<\n",insCnt);
+    int com = combination(7,2);
+    printf(">>>Comb : %d<<<",com);
     return(0);
 }
 
@@ -465,57 +468,6 @@ char* decimalToBinaryFlex(int n) {
     return binaryStr;
 }
 
-// char* nand(char *a,char *b){
-//     int alen = strlen(a);
-//     int blen = strlen(b);
-//     int maxstrlen;
-//     if(alen>=blen){
-//         maxstrlen=alen;
-//     }else{
-//         maxstrlen=blen;
-//     }
-//     char *ret = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
-//     for (int i = maxstrlen -(maxstrlen-alen)- 1; i >= 0; i--) {
-//         ret[i] = '0'; 
-//     }
-//     char *regA = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
-//     for (int i = maxstrlen - 1; i >= 0; i--) {
-//     regA[i] = '0'; 
-//     }
-//     regA[maxstrlen] = '\0';
-//     for (int i = maxstrlen - 1; i >= 0; i--) {
-//         if(a[alen-1]=='1') regA[i] = '1'; 
-//         else regA[i] = '0'; 
-
-//         alen--;
-//         if(alen<0) break;
-//     }
-
-//     char *regB = (char *)malloc((maxstrlen + 1) * sizeof(char)); // +1 for the null terminator
-//     for (int i = maxstrlen - 1; i >= 0; i--) {
-//     regB[i] = '0'; 
-//     }
-//     regB[maxstrlen] = '\0';
-//     for (int i = maxstrlen - 1; i >= 0; i--) {
-//         if(b[blen-1]=='1') regB[i] = '1'; 
-//         else regB[i] = '0'; 
-
-//         blen--;
-//         if(blen<0) break;
-//     }
-//     printf("%s??%s\n",regA,regB);
-
-//     for(int i=0;i<maxstrlen;i++){
-//         if(regA[i]=='1'&&regB[i]=='1'){
-//             ret[i]='0';
-//         }else{
-//             ret[i]='1';
-//         }
-//     }
-//     ret[maxstrlen] = '\0';
-//     return ret;
-// }
-
 char* nand(char *a,char *b){
     int alen = strlen(a);
     int blen = strlen(b);
@@ -566,3 +518,16 @@ char* nand(char *a,char *b){
     ret[16] = '\0';
     return ret;
 }
+
+int combination(int n, int r)
+        {
+
+               if(r == 0 || n == r)
+
+                   return(1);
+
+               else
+
+                   return(combination(n-1,r) + combination(n-1, r-1));
+
+        }
