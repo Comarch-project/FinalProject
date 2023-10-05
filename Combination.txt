@@ -15,9 +15,9 @@ comb    lw  0   6   pos1
         lw  0   6   neg1
         add 1   6   1
         lw   0   6   combAddr
-        jalr    6   7   
+        jalr    6   7
+        lw  0   6   neg1   
         lw  5   2   stack
-        lw  0   6   neg1
         add 5    6   5 
         lw  5   1   stack 
         add 5    6   5 
@@ -29,8 +29,7 @@ comb    lw  0   6   pos1
         lw  0   6   neg1
         add 5   6   5
         jalr    4   0       
-basecase    lw  0   6   pos1 
-            add  6   3   3
+basecase    add  6   3   3
             lw  0   6 neg1
             add 5   6   5
             add 5   6   5       
