@@ -61,11 +61,11 @@ int main(int argc, char *argv[])
             //while (getchar() != '\n'); 
             char *bipo;
             bipo=decimalToBinary(state.mem[state.pc]);
-            printf("%s\n",bipo);
+            //printf("%s\n",bipo);
             insCnt++;
             if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='0'))//add
             {
-                printf("ADD");
+                //printf("ADD");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -83,14 +83,14 @@ int main(int argc, char *argv[])
                 int DecRs = binaryToDecimal(rs);
                 int DecRt = binaryToDecimal(rt);
                 int DestRd = binaryToDecimal(rd);
-                printf(">>>>>>>>%d + %d = %d\n",state.reg[DecRs], state.reg[DecRt],state.reg[DecRs]+state.reg[DecRt]);
+                //printf(">>>>>>>>%d + %d = %d\n",state.reg[DecRs], state.reg[DecRt],state.reg[DecRs]+state.reg[DecRt]);
                 state.reg[DestRd] = state.reg[DecRs]+state.reg[DecRt];
 
                 continue;
             }
             else if((bipo[7]=='0') && (bipo[8]=='0') && (bipo[9]=='1'))//nand
             {
-                printf("NAND");
+                //printf("NAND");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -109,9 +109,7 @@ int main(int argc, char *argv[])
                 int rti = state.reg[binaryToDecimal(rt)];
                 int rdi = binaryToDecimal(rd);
                 char* biOfrsi = decimalToBinaryFlex(rsi);
-                printf(">>>>>>>>%s %d\n",biOfrsi, rsi);
                 char* biOfrti = decimalToBinaryFlex(rti);
-                printf(">>>>>>>>%s %d\n",biOfrti, rti);
                 char* res = nand(biOfrsi,biOfrti);
                 int lenOfres = strlen(res);
                 char *res16b = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
@@ -127,8 +125,6 @@ int main(int argc, char *argv[])
                     if(lenOfres<0) break;
                 }
                 int saveAtReg = binaryToDecimalSign(res16b);
-                printf(">>>>>>>>+%s\n",res16b);
-                printf(">>>>>>>>%d\n",saveAtReg);
 
                 state.reg[rdi] = saveAtReg;
                 free(biOfrsi);
@@ -137,7 +133,7 @@ int main(int argc, char *argv[])
             }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='0'))//lw
             {   
-                printf("LW");
+                //printf("LW");
                 printState(&state);
 
                 char rs[4];
@@ -156,20 +152,15 @@ int main(int argc, char *argv[])
                 }
 
                 int regA = state.reg[binaryToDecimal(rs)];
-                printf("+++++++++++++++%d\n",regA);
                 int regB = binaryToDecimal(rt);
-                printf("+++++++++++++++%d\n",regB);
                 int offseti = binaryToDecimalSign(offset);
-                printf("+++++++++++++++%d\n",offseti);
                 int src = regA + offseti;
-                printf("+++++++++++++++%d\n",src);
-                printf("+++++++++++++++%d\n",state.mem[0]);
                 state.reg[regB] = state.mem[src];
                 continue;
             }
             else if((bipo[7]=='0') && (bipo[8]=='1') && (bipo[9]=='1'))//sw
               {
-                printf("SW");
+                //printf("SW");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -197,7 +188,7 @@ int main(int argc, char *argv[])
               }
             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='0'))//beq
               {
-                printf("BEQ");
+                //printf("BEQ");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -216,19 +207,17 @@ int main(int argc, char *argv[])
                 int argB = state.reg[binaryToDecimal(rt)];
                 int argA = state.reg[binaryToDecimal(rs)];
                 int offseti = binaryToDecimalSign(offset);
-                printf("A%d\n",argA);
-                printf("B%d\n",argB);
+                //printf("A%d||B%d\n",argA,argB);
                 if(argA == argB){
                     //insert action here
                     state.pc = state.pc+offseti;
-                    printf("Equal!Goto %d\n",state.pc);
                 }
                 continue;
 
               }
             else if((bipo[7]=='1') && (bipo[8]=='0') && (bipo[9]=='1'))//jalr
              {
-                printf("JALR");
+                //printf("JALR");
                 printState(&state);
                 char rs[4];
                 rs[2]=bipo[12];
@@ -249,24 +238,21 @@ int main(int argc, char *argv[])
                 if(regA==regB){
                     state.reg[regB]=state.pc+1;
                 }else{
-                    printf("[regA] : %d\n",regA);
-                    printf("state.reg[regA] : %d\n",state.reg[regA]);
                     state.reg[regB]=state.pc+1;
                     state.pc=state.reg[regA]-1;
-                    printf("PC : %d\n",state.pc);
                 } 
                 continue;
              }
             else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))//halt
              {
-                printf("HALT");
+                //printf("HALT");
                 printState(&state);
                 endOfPro =1;
                 continue;
              }
             else if ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))//noop
              {
-                printf("NOOP");
+                //printf("NOOP");
                 printState(&state);
                 continue;
              }
@@ -274,8 +260,10 @@ int main(int argc, char *argv[])
         }
     printState(&state);
     printf(">>>Instruction used : %d<<<\n",insCnt);
-    int com = combination(7,2);
-    printf(">>>Comb : %d<<<",com);
+    int n = 3;
+    int r = 2;
+    int com = combination(n,r);
+    printf(">>>Combination(%d,%d) : %d\n<<<",n,r,com);
     return(0);
 }
 
@@ -506,7 +494,6 @@ char* nand(char *a,char *b){
         blen--;
         if(blen<0) break;
     }
-    printf("%s??%s\n",regA,regB);
 
     for(int i=0;i<16;i++){
         if(regA[i]=='1'&&regB[i]=='1'){

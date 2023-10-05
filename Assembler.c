@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         linecnt++;
     }
     for (int i = 0; i < keyvalpt; i++) {
-        printf("> lable : %s value : %s Addr : %s\n",keyValueList[i].key,keyValueList[i].value,keyValueList[i].address);
+        printf(">>> lable : %s ,value : %s ,Addr : %s\n",keyValueList[i].key,keyValueList[i].value,keyValueList[i].address);
     }
     rewind(inFilePtr);
 
@@ -300,7 +300,6 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                         char offsetc[32];
                         sprintf(offsetc, "%d", offseti);
                         biOff = decToBiSign16b(offsetc,linecnt);
-                        printf("%s\n",biOff);
                         break;
                     }else if(i == keyvalpt){
                         printf("Label %s was undefined",arg2);
@@ -387,7 +386,6 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                     }
                 }
             }
-            printf("biCode: %s\n",biCode);
             strcpy(binaryMachCode,biCode);
             biToHex4fill(biCode,outFilePtr,outFilePtrSim,linecnt,value);
             free(biCode);
@@ -395,10 +393,9 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
         //char *biResult = decToBiUnsign(arg2);
         // char *biResult = decToBiSign16b(arg2);
         // free(biResult); // Free the allocated memosry
-        printf("binaryOp: %s\n",binaryOp);
-        printf("address : %d\n",linecnt);
-        printf("biMachCode: %s \n",binaryMachCode);
         if(strcmp(opcode, ".fill")) biToHex(binaryMachCode,outFilePtr,outFilePtrSim,linecnt);
+        printf("Address : %d\n",linecnt);
+        printf("Binary: %s \n",binaryMachCode);
         printf("--------------------------------------------\n");
         strcpy(binaryMachCode, "00000000000000000000000000000000");
         linecnt++;
@@ -420,8 +417,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
  */
 
 
-int readAndParse(FILE *inFilePtr, char *label, char *opcode, char *arg0,
-    char *arg1, char *arg2)
+int readAndParse(FILE *inFilePtr, char *label, char *opcode, char *arg0,char *arg1, char *arg2)
 {
     char line[MAXLINELENGTH];
     char *ptr = line;
