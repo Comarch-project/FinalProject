@@ -1,0 +1,20 @@
+        lw 0 2 mcand 
+        lw 0 3 mpiler
+        lw 0 4 regLoop
+        lw 0 5 nandMat
+        lw 0 6 neg1
+start   beq 4 0 done
+        nand 3 5 7
+        nand 7 7 7 
+        add 1 1 1
+        add 3 3 3
+        add 4 6 4 
+        beq 7 0 start
+        add 1 2 1
+        beq 0 0 start
+done    halt
+mcand   .fill 32766
+mpiler  .fill 10383
+regLoop .fill 15
+nandMat .fill 16384
+neg1    .fill -1
