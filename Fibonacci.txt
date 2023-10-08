@@ -1,0 +1,21 @@
+        lw      0       1       n  
+        lw      0       3       pos1
+        beq     1       2       done
+        beq     1       3       done
+loop    add     2       3       4
+        sw      6       3       stack
+        lw      0       7       pos1
+        add     6       7       6
+        sw      6       4       stack  
+        lw      6       3       stack
+        lw      0       7       neg1
+        add     6       7       6
+        lw      6       2       stack
+        add     1       7       1
+        beq     1       0       done
+        beq     0       0       loop
+done    halt
+n .fill 4
+pos1 .fill 1
+neg1 .fill -1
+stack   .fill   0
