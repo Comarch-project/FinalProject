@@ -267,10 +267,10 @@ int main(int argc, char *argv[])
     printState(&state);
     //printf(">>>Instruction used : %d<<<\n",insCnt); // uncomment to see the instruction used
 
-    int n = 3;
-    int r = 2;
+    int n = 7;
+    int r = 3;
     int com = combination(n,r);
-    // printf(">>>Combination(%d,%d) : %d<<<\n",n,r,com); // change the value of n , r and uncomment to check the combination outcome
+    //printf(">>>Combination(%d,%d) : %d<<<\n",n,r,com); // change the value of n , r and uncomment to check the combination outcome
     return(0);
 }
 // printState print the state of program
