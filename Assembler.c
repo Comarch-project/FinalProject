@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
 
     // Define the maximum number of key-value pairs in the list
     int maxPairs = 32;
-    // Create an array of KeyValuePair structs to store the data
+    // Create an array of KeyValuePair structs to store the lable data
     struct KeyValuePair keyValueList[maxPairs];
     // Wrong input when calling assembler
     if (argc != 4) { 
@@ -43,24 +43,25 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     inFileString = argv[1];
     outFileString = argv[2];
     outFileStringSim = argv[3];
-
+    //open input file with read mode
     inFilePtr = fopen(inFileString, "r");                       
     if (inFilePtr == NULL) {                                     
         printf("error in opening %s\n", inFileString);
         exit(1);
     }
+    //open output file with write mode
     outFilePtr = fopen(outFileString, "w");
     if (outFilePtr == NULL) {
         printf("error in opening %s\n", outFileString);
         exit(1);
     }
-
+    //open output for simulator file with write mode
     outFilePtrSim = fopen(outFileStringSim, "w");
     if (outFilePtrSim == NULL) {
         printf("error in opening %s\n", outFileStringSim);
         exit(1);
     }
-     // Read all line in file to indicate false instruction
+    // Read all line in file to indicate false instruction
     int linecnt = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")||!strcmp(opcode,"add")||!strcmp(opcode,"nand")||!strcmp(opcode,"lw")||!strcmp(opcode,"sw")||!strcmp(opcode,"beq")||!strcmp(opcode,"jalr")||!strcmp(opcode,"halt")||!strcmp(opcode,"noop")){
@@ -70,22 +71,22 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             exit(1) ;
         }
     }
-    rewind(inFilePtr);
+    rewind(inFilePtr); // rewind the input
     // Initiate value of each lable 
     linecnt = 0;// To indicate address
     int keyvalpt = 0;// To indicate current size of keyValue
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
-        if(!strcmp(opcode,".fill")){
-            strcpy(keyValueList[keyvalpt].type, opcode);
-            strcpy(keyValueList[keyvalpt].key, label);
-            if(isNumber(arg0)){
-                strcpy(keyValueList[keyvalpt].value, arg0) ;
+        if(!strcmp(opcode,".fill")){ // if the opcode was fill then it is the lable 
+            strcpy(keyValueList[keyvalpt].type, opcode); // assign opcode (just in case) 
+            strcpy(keyValueList[keyvalpt].key, label); // assign label name
+            if(isNumber(arg0)){// if the label input was number
+                strcpy(keyValueList[keyvalpt].value, arg0) ; // assign value directly
                 char str[20] ;
                 sprintf(str, "%d", linecnt);
-                strcpy(keyValueList[keyvalpt].address, str);
-            }else{
+                strcpy(keyValueList[keyvalpt].address, str); // assign the address of the lable
+            }else{// if the label input was label (symbolic)
                 int i;
-                for (i = 0; i < maxPairs; i++) {
+                for (i = 0; i < maxPairs; i++) { //find the matching key in key-value pair list
                     if (!strcmp(keyValueList[i].key, arg0)) {
                         strcpy(keyValueList[keyvalpt].value, keyValueList[i].value);
                         char str[20] ;
@@ -96,43 +97,46 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                 }
             }
             keyvalpt++;
-        }else if(strcmp(label,"")){
-            for (int i = 0; i < keyvalpt; i++) {
+        }else if(strcmp(label,"")){  // if the label filled but opcode wasn't .fill then it is the instruction lable 
+            for (int i = 0; i < keyvalpt; i++) { // find duplicated instruction label
                 if(!strcmp(label, keyValueList[i].key)){
                     printf("Duplicated lable at line %d",linecnt+1);
                     exit(1) ;
                 }
             }
-            strcpy(keyValueList[keyvalpt].type, opcode);
-            strcpy(keyValueList[keyvalpt].key, label);
+            // if the instruction label was not duplicated 
+            strcpy(keyValueList[keyvalpt].type, opcode);// assign opcode (just in case) 
+            strcpy(keyValueList[keyvalpt].key, label);// assign label name
             char str[20] ;
             sprintf(str, "%d", linecnt);
-            strcpy(keyValueList[keyvalpt].value, str);
-            strcpy(keyValueList[keyvalpt].address, str);
+            strcpy(keyValueList[keyvalpt].value, str); // assign value according to the address of that instruction
+            strcpy(keyValueList[keyvalpt].address, str);// assign the address of the lable
             keyvalpt++;
         }
         linecnt++;
     }
+    // get the output of key-value list assigning
     for (int i = 0; i < keyvalpt; i++) {
         printf(">>> lable : %s ,value : %s ,Addr : %s\n",keyValueList[i].key,keyValueList[i].value,keyValueList[i].address);
     }
-    rewind(inFilePtr);
+    rewind(inFilePtr);// rewind the input
 
     linecnt = 0;
+    // start reading input line by line and turn it into machine code
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)) {
         printf("Label: %s, Opcode: %s, Arg0: %s, Arg1: %s, Arg2: %s\n", label, opcode, arg0, arg1, arg2);
-        if (!strcmp(opcode, "add")||!strcmp(opcode, "nand")) {
+        if (!strcmp(opcode, "add")||!strcmp(opcode, "nand")) {// if the instruction was add or nand
             char *biRS,*biRT,*biRD;
-            //Add opcode
+            // Add opcode
             if(!strcmp(opcode, "add")) strcpy(binaryOp,"000");
             if(!strcmp(opcode, "nand")) strcpy(binaryOp,"001");
             binaryMachCode[7]=binaryOp[0];
             binaryMachCode[8]=binaryOp[1];
             binaryMachCode[9]=binaryOp[2];
-            //Add rs
-            if(isNumber(arg0)){
+            // Add rs
+            if(isNumber(arg0)){// if the arg0 is number then directly assign
                 biRS = decToBiUnsign3b(arg0);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
@@ -146,10 +150,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[10]=biRS[0];
             binaryMachCode[11]=biRS[1];
             binaryMachCode[12]=biRS[2];
-            //Add rt
-            if(isNumber(arg1)){
+            // Add rt
+            if(isNumber(arg1)){// if the arg1 is number then directly assign 
                 biRT = decToBiUnsign3b(arg1);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
@@ -163,10 +167,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[13]=biRT[0];
             binaryMachCode[14]=biRT[1];
             binaryMachCode[15]=biRT[2];
-            //Add rd
-            if(isNumber(arg2)){
+            // Add rd
+            if(isNumber(arg2)){// if the arg2 is number then directly assign
                 biRD = decToBiUnsign3b(arg2);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         biRD = decToBiUnsign3b(keyValueList[i].value);
@@ -180,21 +184,22 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[29]=biRD[0];
             binaryMachCode[30]=biRD[1];
             binaryMachCode[31]=biRD[2];
-
+            // free the memory
             free(biRS);
             free(biRT);
             free(biRD);
-        }else if(!strcmp(opcode, "lw")||!strcmp(opcode, "sw")){
+        }else if(!strcmp(opcode, "lw")||!strcmp(opcode, "sw")){// if the instruction lw or sw
             char *biRS,*biRT,*biOff;
+            // Add opcode
             if(!strcmp(opcode, "lw"))strcpy(binaryOp,"010");
             if(!strcmp(opcode, "sw"))strcpy(binaryOp,"011");
             binaryMachCode[7]=binaryOp[0];
             binaryMachCode[8]=binaryOp[1];
             binaryMachCode[9]=binaryOp[2];
-            //Add rs
-            if(isNumber(arg0)){
+            // Add rs
+            if(isNumber(arg0)){// if the arg0 is number then directly assign
                 biRS = decToBiUnsign3b(arg0);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
@@ -209,9 +214,9 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[11]=biRS[1];
             binaryMachCode[12]=biRS[2];
             //Add rd
-            if(isNumber(arg1)){
+            if(isNumber(arg1)){// if the arg1 is number then directly assign 
                 biRT = decToBiUnsign3b(arg1);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
@@ -226,12 +231,12 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[14]=biRT[1];
             binaryMachCode[15]=biRT[2];
             //Add offsetField
-            if(isNumber(arg2)){
+            if(isNumber(arg2)){// if the arg2 is number then directly assign 
                 biOff = decToBiSign16b(arg2,linecnt);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
-                            if(atoi(keyValueList[i].value)>32768||atoi(keyValueList[i].key)<(-32768)){
+                            if(atoi(keyValueList[i].value)>32768||atoi(keyValueList[i].key)<(-32768)){// check if the input has more than 16 bit or not
                             printf("Wrong offset input at line %d",linecnt+1);
                             exit(1) ;
                         }
@@ -246,20 +251,21 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             for(int i=16;i<32;i++){
                 binaryMachCode[i]=biOff[i-16];
             }
-
+            // free the memory
             free(biRS);
             free(biRT);
             free(biOff);
-        }else if(!strcmp(opcode, "beq")){
+        }else if(!strcmp(opcode, "beq")){// if the instruction was beq
             char *biRS,*biRT,*biOff;
+            // Add opcode
             strcpy(binaryOp,"100");
             binaryMachCode[7]=binaryOp[0];
             binaryMachCode[8]=binaryOp[1];
             binaryMachCode[9]=binaryOp[2];
-            //Add rs
-            if(isNumber(arg0)){
+            // Add rs
+            if(isNumber(arg0)){// if the arg0 is number then directly assign 
                 biRS = decToBiUnsign3b(arg0);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].value);
@@ -273,10 +279,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[10]=biRS[0];
             binaryMachCode[11]=biRS[1];
             binaryMachCode[12]=biRS[2];
-            //Add rd
-            if(isNumber(arg1)){
+            // Add rd
+            if(isNumber(arg1)){// if the arg1 is number then directly assign 
                 biRT = decToBiUnsign3b(arg1);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
@@ -290,10 +296,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[13]=biRT[0];
             binaryMachCode[14]=biRT[1];
             binaryMachCode[15]=biRT[2];
-            //Add offsetField
-            if(isNumber(arg2)){
+            // Add offsetField
+            if(isNumber(arg2)){// if the arg2 is number then directly assign
                 biOff = decToBiSign16b(arg2,linecnt);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         int offseti = (-linecnt)-1+atoi(keyValueList[i].address);
@@ -310,21 +316,22 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             for(int i=16;i<32;i++){
                 binaryMachCode[i]=biOff[i-16];
             }
-
+            // free the memory
             free(biRS);
             free(biRT);
             free(biOff);
             
-        }else if(!strcmp(opcode, "jalr")){
+        }else if(!strcmp(opcode, "jalr")){// if the instruction was jalr
             char *biRS,*biRT;
+            // Add opcode
             strcpy(binaryOp,"101");
             binaryMachCode[7]=binaryOp[2];
             binaryMachCode[8]=binaryOp[1];
             binaryMachCode[9]=binaryOp[0];
             //Add rs
-            if(isNumber(arg0)){
+            if(isNumber(arg0)){// if the arg0 is number then directly assign
                 biRS = decToBiUnsign3b(arg0);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biRS = decToBiUnsign3b(keyValueList[i].address);
@@ -338,10 +345,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[10]=biRS[0];
             binaryMachCode[11]=biRS[1];
             binaryMachCode[12]=biRS[2];
-            //Add rd
-            if(isNumber(arg1)){
+            // Add rd
+            if(isNumber(arg1)){// if the arg1 is number then directly assign 
                 biRT = decToBiUnsign3b(arg1);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
@@ -355,26 +362,28 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[13]=biRT[0];
             binaryMachCode[14]=biRT[1];
             binaryMachCode[15]=biRT[2];
-            
+            // free the memory
             free(biRS);
             free(biRT);
-        }else if(!strcmp(opcode, "halt")){
+        }else if(!strcmp(opcode, "halt")){// if the instruction was halt
+            // Add opcode
             strcpy(binaryOp,"110");
             binaryMachCode[7]=binaryOp[0];
             binaryMachCode[8]=binaryOp[1];
             binaryMachCode[9]=binaryOp[2];
-        }else if(!strcmp(opcode, "noop")){
+        }else if(!strcmp(opcode, "noop")){// if the instruction was noop
+            // Add opcode
             strcpy(binaryOp,"111");
             binaryMachCode[7]=binaryOp[0];
             binaryMachCode[8]=binaryOp[1];
             binaryMachCode[9]=binaryOp[2];
-        }else if(!strcmp(opcode, ".fill")){
+        }else if(!strcmp(opcode, ".fill")){// if the instruction .fill
             char *biCode;
             int value;
-            if(isNumber(arg0)){
+            if(isNumber(arg0)){// if the arg0 is number then directly assign
                 biCode=decToBiSign32b(arg0);
                 value = atoi(arg0);
-            }else{
+            }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg0, keyValueList[i].key)){
                         biCode=decToBiSign32b(keyValueList[i].value);
@@ -387,19 +396,21 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                 }
             }
             strcpy(binaryMachCode,biCode);
+            // print the output to output file
             biToHex4fill(biCode,outFilePtr,outFilePtrSim,linecnt,value);
+            // free the memory
             free(biCode);
         }
-        //char *biResult = decToBiUnsign(arg2);
-        // char *biResult = decToBiSign16b(arg2);
-        // free(biResult); // Free the allocated memosry
+        // print the output to output file for non .fill instruction
         if(strcmp(opcode, ".fill")) biToHex(binaryMachCode,outFilePtr,outFilePtrSim,linecnt);
+        // print to see the outcome of the result
         printf("Address : %d\n",linecnt);
         printf("Binary: %s \n",binaryMachCode);
         printf("--------------------------------------------\n");
         strcpy(binaryMachCode, "00000000000000000000000000000000");
         linecnt++;
     }
+    // close the output file
     fclose(outFilePtr);
     exit(0);
 }
@@ -415,8 +426,6 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
  *
  * exit(1) if line is too long.
  */
-
-
 int readAndParse(FILE *inFilePtr, char *label, char *opcode, char *arg0,char *arg1, char *arg2)
 {
     char line[MAXLINELENGTH];
@@ -461,31 +470,32 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
+// biToHex convert binary to hexadecimal and print it in output file with a format of "instruction"
 int biToHex(char bin[],FILE *str,FILE *strSim,int addr){
     // Convert binary to integer using strtol
-    unsigned int decimal = strtoll(bin, NULL, 2);
+    unsigned int decimal = strtoll(bin, NULL, 2);//convert string to long long int
     fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,decimal,decimal);
     fprintf(strSim,"%d\n",decimal);
-    printf("Hexadecimal: %X\n", decimal);         //write to text here
+    printf("Hexadecimal: %X\n", decimal);//write to text here
     return(1);
 }
-
+// biToHex4Fill convert binary to hexadecimal and print it in output file with a format of ".fill"
 int biToHex4fill(char bin[],FILE *str,FILE *strSim,int addr,int val){
     // Convert binary to integer using strtol
-    unsigned int decimal = strtoll(bin, NULL, 2);
+    unsigned int decimal = strtoll(bin, NULL, 2); //convert string to long long int
     fprintf(str,"(address %d): %d (hex 0x%X)\n", addr,val,decimal);\
     fprintf(strSim,"%d\n", val);
-    printf("Hexadecimal: %X\n", decimal);         //write to text here
+    printf("Hexadecimal: %X\n", decimal);//write to text here
     return(1);
 }
-
+// decToBiSign16b convert decimal to 16 bit signed binary
 char* decToBiSign16b(char *string,int linecnt) {
-    long int n =atol(string);
-    if(n>32768||n<(-32768)){
+    long int n =atol(string);// // Use atol to convert string to long int
+    if(n>32768||n<(-32768)){// if  the input is more than 16 bit exit(1)
         printf("Wrong offset input at line %d",linecnt+1);
         exit(1) ;
     }
-    // Determine the number of bits dynamically
+
     // Allocate memory for the binary string
     char *binaryStr = (char *)malloc((16 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 16 - 1; i >= 0; i--) {
@@ -514,7 +524,7 @@ char* decToBiSign16b(char *string,int linecnt) {
                 binaryStr[i] = '0'; // Carry over to the next bit
             }
         }
-    }else{
+    }else{// if the input was positive or 0
     // Convert the decimal number to binary and store it in binaryStr
         for (int i = 16 - 1; i >= 0; i--) {
         binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
@@ -524,11 +534,9 @@ char* decToBiSign16b(char *string,int linecnt) {
     }
     return binaryStr;
 }
-
-
+// decToBiUnsign3b convert decimal to 16 bit unsigned binary
 char* decToBiUnsign3b(char *string) { 
     long int n = atol(string); // Use atol to convert string to long int
-    
     // Allocate memory for the binary string
     char *binaryStr = (char *)malloc((3+ 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 3 - 1; i >= 0; i--) {
@@ -539,16 +547,13 @@ char* decToBiUnsign3b(char *string) {
         binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
         n = n / 2;
     }
-
     binaryStr[3] = '\0'; // Null-terminate the string
 
     return binaryStr;
 }
-
-
+// decToBiSign32b convert decimal to 32 bit signed binary
 char* decToBiSign32b(char *string) {  
-    long int n =atol(string);
-    // Determine the number of bits dynamically
+    long int n =atol(string);// Use atol to convert string to long int
     // Allocate memory for the binary string
     char *binaryStr = (char *)malloc((32 + 1) * sizeof(char)); // +1 for the null terminator
     for (int i = 32 - 1; i >= 0; i--) {
@@ -577,7 +582,7 @@ char* decToBiSign32b(char *string) {
                 binaryStr[i] = '0'; // Carry over to the next bit
             }
         }
-    }else{
+    }else{// if the input was positive or 0
     // Convert the decimal number to binary and store it in binaryStr
         for (int i = 32 - 1; i >= 0; i--) {
         binaryStr[i] = (n % 2) + '0'; // Convert remainder to character '0' or '1'
