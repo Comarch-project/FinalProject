@@ -1,44 +1,38 @@
-main    lw   0   1   n                  // $1 = memory[n]
-        lw   0   2   r                  // $2 = memory[r] both is our input for function
-        lw   0   6   combAddr           // prepare to call combination function $6=combi
-        jalr 6   7                      // call combi; $7 = return address
-        halt
-combi   lw   0   6   pos1               // $6 = 1
-        add  5   6   5                  // increment stack pointer
-        sw   5   7   stack              // save return address on stack
-        add  5   6   5                  // increment stack pointer
-        sw   5   1   stack              // save n on stack
-        add  5   6   5                  // increment stack pointer
-        sw   5   2   stack              // save r on stack
-if      beq  2   0   then               // base_case scenario that if r == 0 go to then
-        beq  2   1   then               // base_case scenario that if r == n go to then
-else    lw   0   6   neg1               // $6 = -1
-        add  1   6   1                  // decrement n (n-1)
-        lw   0   6   combAddr           // $6 = combi
-        jalr 6   7                      // call combi; $7 = return address
-        lw   0   6   neg1               // $6 = -1
-        lw   5   2   stack              // recover previous $2
-        add  5   6   5                  // decrement stack pointer
-        lw   5   1   stack              // recover previous $1 
-        add  5   6   5                  // decrement stack pointer
-        add  1   6   1                  // decrement n by 1 (n-1)
-        add  2   6   2                  // decrement r by 1 (r-1)
-        lw   0   6   combAddr           // $6 = combi
-        jalr 6   7                      // call combi; $7 = return address
-        lw   5   4   stack              // recover leftover return address
-        lw   0   6   neg1               // $6 = -1
-        add  5   6   5                  // decrement stack pointer
-        jalr 4   0                      // return
-then    add  6   3   3                  // $3 = value in $6 + value in $3 (increase result by 1)
-        lw   0   6   neg1               // $6 = -1
-        add  5   6   5                  // decrement stack pointer
-        add  5   6   5                  // decrement stack pointer
-        lw   5   4   stack              // recover return address from stack
-        add  5   6   5                  // decrement stack pointer
-        jalr 4   0                      // return 
-n        .fill  7
-r        .fill  3
-pos1     .fill  1
-neg1     .fill -1
-combAddr .fill combi
-stack    .fill 0
+main    lw      0       2       dividend                // $2 = dividend
+        sw      0       2       tempdividend            // save $2 as a tempdividend for tracking the remainder
+        lw      0       3       divisor                 // $3 = divisor         
+loop    beq     2       0       done                    // if dividend == 0 end the programe (the result is 0 and store in $1)
+        beq     2       3       exact                   // if the dividend == divisor call the exact function
+        lw      0       7       neg1                    // $7 = -1
+        lw      0       5       tempdividend            // $5 = tempdividend use $5 to check whether the remainder was diviedable by divisor or not
+        lw      0       6       divisor                 // $6 = divisor use for the subtraction loop
+subloop add     5       7       5                       // $5 = $5 - 1
+        add     6       7       6                       // $6 = $6 - 1 
+        beq     5       0       done                    // if $5 == 0 end the program that mean the remaining can't be divide anymore 
+        beq     6       0       increment               // if $6 == 0 and $5 != 0 then the remaining is divideable with this we call increment
+        beq     0       0       subloop                 // else loop the subtraction
+increment lw      0       7       pos1                  // $7 = 1
+          add     1       7       1                     // $1 = $1 + $7(1) (increase the result by 1)
+          lw      0       7       neg1                  // $7 = -1
+          lw      0       6       divisor               // $6 = divisor use for the subtraction loop
+subloopt  add     2       7       2                     // $2 = $2 - $7(-1) after the result increase we subtrac the divisor from the remaining dividend (note that this subloop is for non-exact divide)
+          add     6       7       6                     // $6 = $6 - 1
+          sw      0       2       tempdividend          // save $2 as a tempdividend for tracking the remainder
+          beq     2       0       done                  // if $2 == 0 end the program that mean the remaining can't be divide anymore 
+          beq     6       0       loop                  // if $6 == 0 and $2 != 0 then the remaining is still divideable with this we call loop function which will check and try divide to divide $2 again
+          beq     0       0       subloopt              // else loop the subtraction
+exact      lw      0       7       pos1                 // $7 = 1
+           add     1       7       1                    // $1 = $1 + $7(1) (increase the result by 1)
+           lw      0       7       neg1                 // $7 = -1             
+           lw      0       6       divisor              // $6 = divisor use for the subtraction loop
+sublooptt  add     2       7       2                    // $2 = $2 - $7(-1) after the result increase we subtrac the divisor from the dividend (note that this subloop is for exact divide to find remaining)                     
+           add     6       7       6                    // $6 = $6 - 1
+           beq     2       0       done                 // if $2 == 0 end the program that mean the remaining can't be divide anymore 
+           beq     6       0       loop                 // if $6 == 0 and $2 != 0 then the remaining is still divideable with this we call loop function which will check and try divide to divide $2 again
+           beq     0       0       sublooptt            // else loop the subtraction        
+done      halt                                          // end the program $1 = result $2 = remainder
+dividend     .fill 38
+divisor      .fill 7
+pos1         .fill 1
+neg1         .fill -1
+tempdividend .fill 0

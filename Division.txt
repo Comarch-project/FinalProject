@@ -30,9 +30,9 @@ sublooptt  add     2       7       2                    // $2 = $2 - $7(-1) afte
            beq     2       0       done                 // if $2 == 0 end the program that mean the remaining can't be divide anymore 
            beq     6       0       loop                 // if $6 == 0 and $2 != 0 then the remaining is still divideable with this we call loop function which will check and try divide to divide $2 again
            beq     0       0       sublooptt            // else loop the subtraction        
-done      halt                                          // end the program
-dividend     .fill 12123
-divisor      .fill 312
+done      halt                                          // end the program $1 = result $2 = remainder
+dividend     .fill 38
+divisor      .fill 7
 pos1         .fill 1
 neg1         .fill -1
 tempdividend .fill 0
