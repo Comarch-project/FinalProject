@@ -5,7 +5,7 @@
         lw 0 6 neg1             // load neg1 to $6 which is use to decrease the regLoop
 start   beq 4 0 done            // check that did we loop all the bit already or not(by checking the regLoop) if looped all the bit then end the program
         nand 3 5 7              // nand multiplier with nandMat store in $7 which will turn all bits to 1 if the 15th bit of multiplier was 0 and will return all bit to 1 except 15th bit if the 15th bit was 1
-        nand 7 7 7              // nand the result of $7 together which will result 0 if the 15th bit was 0 and will result 16348(100000000000000) if the 15th bit was 1
+        nand 7 7 7              // nand the result of $7 together which will result 0 if the 15th bit was 0 and will result 16384(100000000000000) if the 15th bit was 1
         add 1 1 1               // shift left the result($1)
         add 3 3 3               // shift left the multiplier($3)
         add 4 6 4               // decrease regLoop by 1
