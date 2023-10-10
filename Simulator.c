@@ -515,7 +515,7 @@ char* nand(char *a,char *b){
     ret[16] = '\0';// Null-terminate the string
     return ret;
 }
-// nand perform a combination function use to check the out come of function
+//combination function that have been given use to perform a combination function use to check the out come of function
 int combination(int n, int r)
         {
 
