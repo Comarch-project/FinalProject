@@ -250,10 +250,11 @@ int main(int argc, char *argv[])
              }
             else if((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='0'))// if bipo has an opcode of halt
              {
-                //printf("HALT");
                 printState(&state);
+                printf("machine halted\n");
                 endOfPro =1;// set endOfPro to 1 which will terminate the loop and end the program
                 continue;
+
              }
             else if ((bipo[7]=='1') && (bipo[8]=='1') && (bipo[9]=='1'))// if bipo has an opcode of noop
              {
@@ -264,8 +265,10 @@ int main(int argc, char *argv[])
              }
 
         }
+
+    printf("total of %d instruction executed \n",insCnt); // uncomment to see the instruction used
+    printf("final state of machine:\n"); // uncomment to see the instruction used
     printState(&state);
-    //printf(">>>Instruction used : %d<<<\n",insCnt); // uncomment to see the instruction used
 
     int n = 7;
     int r = 3;
