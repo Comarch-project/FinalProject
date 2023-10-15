@@ -491,7 +491,7 @@ int biToHex4fill(char bin[],FILE *str,FILE *strSim,int addr,int val){
 // decToBiSign16b convert decimal to 16 bit signed binary
 char* decToBiSign16b(char *string,int linecnt) {
     long int n =atol(string);// // Use atol to convert string to long int
-    if(n>32768||n<(-32768)){// if  the input is more than 16 bit exit(1)
+    if(n>32767||n<(-32768)){// if  the input is more than 16 bit exit(1)
         printf("Wrong offset input at line %d",linecnt+1);
         exit(1) ;
     }
