@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             //Add rd
             if(isNumber(arg1)){// if the arg1 is number then directly assign 
                 biRT = decToBiUnsign3b(arg1);
-            }else{// if it was label then search from the key-value pair list
+            }else{// if it was label then search from the key32value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg1, keyValueList[i].key)){
                         biRT = decToBiUnsign3b(keyValueList[i].value);
@@ -236,9 +236,9 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
-                            if(atoi(keyValueList[i].value)>32768||atoi(keyValueList[i].key)<(-32768)){// check if the input has more than 16 bit or not
+                            if(atoi(keyValueList[i].value)>32767||atoi(keyValueList[i].value)<(-32768)){// check if the input has more than 16 bit or not
                             printf("Wrong offset input at line %d",linecnt+1);
-                            exit(1) ;
+                            exit(1);
                         }
                         biOff = decToBiSign16b(keyValueList[i].address,linecnt);
                         break;
