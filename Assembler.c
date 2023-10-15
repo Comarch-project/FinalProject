@@ -232,11 +232,15 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[15]=biRT[2];
             //Add offsetField
             if(isNumber(arg2)){// if the arg2 is number then directly assign 
+                if(atoi(arg2)>32767||atoi(arg2)<(-32768)){// check if the input has more than 16 bit or not
+                    printf("Wrong offset input at line %d",linecnt+1);
+                    exit(1);
+                }
                 biOff = decToBiSign16b(arg2,linecnt);
             }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
-                            if(atoi(keyValueList[i].value)>32767||atoi(keyValueList[i].value)<(-32768)){// check if the input has more than 16 bit or not
+                        if(atoi(keyValueList[i].value)>32767||atoi(keyValueList[i].value)<(-32768)){// check if the input has more than 16 bit or not
                             printf("Wrong offset input at line %d",linecnt+1);
                             exit(1);
                         }
@@ -298,11 +302,19 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             binaryMachCode[15]=biRT[2];
             // Add offsetField
             if(isNumber(arg2)){// if the arg2 is number then directly assign
+                 if(atoi(arg2)>32767||atoi(arg2)<(-32768)){// check if the input has more than 16 bit or not
+                    printf("Wrong offset input at line %d",linecnt+1);
+                    exit(1);
+                }
                 biOff = decToBiSign16b(arg2,linecnt);
             }else{// if it was label then search from the key-value pair list
                 for (int i = 0; i <= keyvalpt; i++) {
                     if(!strcmp(arg2, keyValueList[i].key)){
                         int offseti = (-linecnt)-1+atoi(keyValueList[i].address);
+                        if(offseti>32767||offseti<(-32768)){// check if the input has more than 16 bit or not
+                            printf("Wrong offset input at line %d",linecnt+1);
+                            exit(1);
+                        }
                         char offsetc[32];
                         sprintf(offsetc, "%d", offseti);
                         biOff = decToBiSign16b(offsetc,linecnt);
