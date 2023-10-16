@@ -1,38 +1,38 @@
-main    lw      0       2       dividend                // $2 = dividend
-        sw      0       2       tempdividend            // save $2 as a tempdividend for tracking the remainder
-        lw      0       3       divisor                 // $3 = divisor         
+main    lw      0       2       divend                  // $2 = dividend
+        sw      0       2       tdiend                  // save $2 as a tempdividend for tracking the remainder
+        lw      0       3       divsor                  // $3 = divisor         
 loop    beq     2       0       done                    // if dividend == 0 end the programe (the result is 0 and store in $1)
         beq     2       3       exact                   // if the dividend == divisor call the exact function
         lw      0       7       neg1                    // $7 = -1
-        lw      0       5       tempdividend            // $5 = tempdividend use $5 to check whether the remainder was diviedable by divisor or not
-        lw      0       6       divisor                 // $6 = divisor use for the subtraction loop
-subloop add     5       7       5                       // $5 = $5 - 1
+        lw      0       5       tdiend                  // $5 = tempdividend use $5 to check whether the remainder was diviedable by divisor or not
+        lw      0       6       divsor                  // $6 = divisor use for the subtraction loop
+subl    add     5       7       5                       // $5 = $5 - 1
         add     6       7       6                       // $6 = $6 - 1 
         beq     5       0       done                    // if $5 == 0 end the program that mean the remaining can't be divide anymore 
-        beq     6       0       increment               // if $6 == 0 and $5 != 0 then the remaining is divideable with this we call increment
-        beq     0       0       subloop                 // else loop the subtraction
-increment lw      0       7       pos1                  // $7 = 1
+        beq     6       0       incre                   // if $6 == 0 and $5 != 0 then the remaining is divideable with this we call increment
+        beq     0       0       subl                    // else loop the subtraction
+incre     lw      0       7       pos1                  // $7 = 1
           add     1       7       1                     // $1 = $1 + $7(1) (increase the result by 1)
           lw      0       7       neg1                  // $7 = -1
-          lw      0       6       divisor               // $6 = divisor use for the subtraction loop
-subloopt  add     2       7       2                     // $2 = $2 - $7(-1) after the result increase we subtrac the divisor from the remaining dividend (note that this subloop is for non-exact divide)
+          lw      0       6       divsor                // $6 = divisor use for the subtraction loop
+sublt     add     2       7       2                     // $2 = $2 - $7(-1) after the result increase we subtrac the divisor from the remaining dividend (note that this subloop is for non-exact divide)
           add     6       7       6                     // $6 = $6 - 1
-          sw      0       2       tempdividend          // save $2 as a tempdividend for tracking the remainder
+          sw      0       2       tdiend                // save $2 as a tempdividend for tracking the remainder
           beq     2       0       done                  // if $2 == 0 end the program that mean the remaining can't be divide anymore 
           beq     6       0       loop                  // if $6 == 0 and $2 != 0 then the remaining is still divideable with this we call loop function which will check and try divide to divide $2 again
-          beq     0       0       subloopt              // else loop the subtraction
+          beq     0       0       sublt                 // else loop the subtraction
 exact      lw      0       7       pos1                 // $7 = 1
            add     1       7       1                    // $1 = $1 + $7(1) (increase the result by 1)
            lw      0       7       neg1                 // $7 = -1             
-           lw      0       6       divisor              // $6 = divisor use for the subtraction loop
-sublooptt  add     2       7       2                    // $2 = $2 - $7(-1) after the result increase we subtrac the divisor from the dividend (note that this subloop is for exact divide to find remaining)                     
+           lw      0       6       divsor               // $6 = divisor use for the subtraction loop
+subltt     add     2       7       2                    // $2 = $2 - $7(-1) after the result increase we subtrac the divisor from the dividend (note that this subloop is for exact divide to find remaining)                     
            add     6       7       6                    // $6 = $6 - 1
            beq     2       0       done                 // if $2 == 0 end the program that mean the remaining can't be divide anymore 
            beq     6       0       loop                 // if $6 == 0 and $2 != 0 then the remaining is still divideable with this we call loop function which will check and try divide to divide $2 again
-           beq     0       0       sublooptt            // else loop the subtraction        
-done      halt                                          // end the program $1 = result $2 = remainder
-dividend     .fill 38
-divisor      .fill 7
+           beq     0       0       subltt               // else loop the subtraction        
+done       halt                                         // end the program $1 = result $2 = remainder
+divend       .fill 38
+divsor       .fill 7
 pos1         .fill 1
 neg1         .fill -1
-tempdividend .fill 0
+tdiend       .fill 0

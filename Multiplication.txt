@@ -1,20 +1,20 @@
         lw 0 2 mcand            // load multiplicant to $2
         lw 0 3 mpiler           // load multiplier to $3
-        lw 0 4 regLoop          // load regLoop to $4 which is the amount of loop time for the multiplication (depends on the maximum bits)
-        lw 0 5 nandMat          // load nandMat to $5 which is use to detect that the 15th bit of multiplier is 1 or 0 
-        lw 0 6 neg1             // load neg1 to $6 which is use to decrease the regLoop
-start   beq 4 0 done            // check that did we loop all the bit already or not(by checking the regLoop) if looped all the bit then end the program
-        nand 3 5 7              // nand multiplier with nandMat store in $7 which will turn all bits to 1 if the 15th bit of multiplier was 0 and will return all bit to 1 except 15th bit if the 15th bit was 1
+        lw 0 4 regL             // load regL to $4 which is the amount of loop time for the multiplication (depends on the maximum bits)
+        lw 0 5 nandM            // load nandM to $5 which is use to detect that the 15th bit of multiplier is 1 or 0 
+        lw 0 6 neg1             // load neg1 to $6 which is use to decrease the regL
+start   beq 4 0 done            // check that did we loop all the bit already or not(by checking the regL) if looped all the bit then end the program
+        nand 3 5 7              // nand multiplier with nandM store in $7 which will turn all bits to 1 if the 15th bit of multiplier was 0 and will return all bit to 1 except 15th bit if the 15th bit was 1
         nand 7 7 7              // nand the result of $7 together which will result 0 if the 15th bit was 0 and will result 16384(100000000000000) if the 15th bit was 1
         add 1 1 1               // shift left the result($1)
         add 3 3 3               // shift left the multiplier($3)
-        add 4 6 4               // decrease regLoop by 1
+        add 4 6 4               // decrease regL by 1
         beq 7 0 start           // if the 15th bit of multiplier was 0 do not thing and start over
         add 1 2 1               // if the 15th bit of multiplier was 1 add multiplicant to result($1)
         beq 0 0 start           // loop the program
 done    halt                    // end the program
 mcand   .fill 32766
 mpiler  .fill 10383
-regLoop .fill 15
-nandMat .fill 16384
+regL    .fill 15
+nandM   .fill 16384
 neg1    .fill -1
