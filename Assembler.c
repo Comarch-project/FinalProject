@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAXLINELENGTH 1000
 
@@ -77,6 +78,13 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     int keyvalpt = 0;// To indicate current size of keyValue
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){ // if the opcode was fill then it is the lable 
+            if(strlen(label)>6){
+                    printf("Lable length too long at line %d",linecnt+1);
+                    exit(1) ;
+            }else if(isdigit(label[0])){
+                    printf("Invalid label name at line %d",linecnt+1);
+                    exit(1) ;
+            }else{
             strcpy(keyValueList[keyvalpt].type, opcode); // assign opcode (just in case) 
             strcpy(keyValueList[keyvalpt].key, label); // assign label name
             if(isNumber(arg0)){// if the label input was number
@@ -97,7 +105,15 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                 }
             }
             keyvalpt++;
+            }
         }else if(strcmp(label,"")){  // if the label filled but opcode wasn't .fill then it is the instruction lable 
+            if(strlen(label)>6){
+                    printf("Lable length too long at line %d",linecnt+1);
+                    exit(1) ;
+            }else if(isdigit(label[0])){
+                    printf("Invalid label name at line %d",linecnt+1);
+                    exit(1) ;
+            }else{
             for (int i = 0; i < keyvalpt; i++) { // find duplicated instruction label
                 if(!strcmp(label, keyValueList[i].key)){
                     printf("Duplicated lable at line %d",linecnt+1);
@@ -112,7 +128,8 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             strcpy(keyValueList[keyvalpt].value, str); // assign value according to the address of that instruction
             strcpy(keyValueList[keyvalpt].address, str);// assign the address of the lable
             keyvalpt++;
-        }
+            }
+          }
         linecnt++;
     }
     // get the output of key-value list assigning
