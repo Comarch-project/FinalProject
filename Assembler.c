@@ -78,10 +78,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
     int keyvalpt = 0;// To indicate current size of keyValue
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
         if(!strcmp(opcode,".fill")){ // if the opcode was fill then it is the lable 
-            if(strlen(label)>6){
+            if(strlen(label)>6){// check if the label has more than 6 letters or not
                     printf("Lable length too long at line %d",linecnt+1);
                     exit(1) ;
-            }else if(isdigit(label[0])){
+            }else if(isdigit(label[0])){// check if label start with number or not
                     printf("Invalid label name at line %d",linecnt+1);
                     exit(1) ;
             }else{
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
                 char str[20] ;
                 sprintf(str, "%d", linecnt);
                 strcpy(keyValueList[keyvalpt].address, str); // assign the address of the lable
-            }else{// if the label input was label (symbolic)
+            }else{ // if the label input was label (symbolic)
                 int i;
                 for (i = 0; i < maxPairs; i++) { //find the matching key in key-value pair list
                     if (!strcmp(keyValueList[i].key, arg0)) {
@@ -107,10 +107,10 @@ int main(int argc, char *argv[]) //argv = argument vector, argc = argument count
             keyvalpt++;
             }
         }else if(strcmp(label,"")){  // if the label filled but opcode wasn't .fill then it is the instruction lable 
-            if(strlen(label)>6){
+            if(strlen(label)>6){ // check if the label has more than 6 letters or not
                     printf("Lable length too long at line %d",linecnt+1);
                     exit(1) ;
-            }else if(isdigit(label[0])){
+            }else if(isdigit(label[0])){ // check if label start with number or not
                     printf("Invalid label name at line %d",linecnt+1);
                     exit(1) ;
             }else{
